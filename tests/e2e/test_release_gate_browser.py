@@ -14,7 +14,7 @@ PASSWORD = "E2E-only-Secret-42!"
 def api(page, path, method="GET", payload=None, *, csrf=True, content_type="application/json", headers=None, raw=None):
     return page.evaluate("""async ({path, method, payload, csrf, contentType, headers, raw}) => {
       const h = {...(headers || {})};
-      if (payload !== null && payload !== undefined && contentType) h['Content-Type'] = contentType;
+      if (((payload !== null && payload !== undefined) || raw !== null) && contentType) h['Content-Type'] = contentType;
       if (csrf) { const m = document.cookie.match(/(?:^|; )potok_csrf=([^;]+)/); if (m) h['X-CSRF-Token'] = decodeURIComponent(m[1]); }
       const r = await fetch(path, {method, credentials:'include', headers:h,
         body: raw !== null ? raw : (payload == null ? undefined : JSON.stringify(payload))});
