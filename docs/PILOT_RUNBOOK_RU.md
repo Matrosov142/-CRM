@@ -1,6 +1,6 @@
 # ПОТОК CRM — запуск технического пилота 0.1
 
-> **Технический статус 2026-11-09:** GitHub Actions подтвердил PostgreSQL 16 migrations/RLS, backend QA и frontend `npm ci`/audit/build на временном lockfile candidate. Сам `frontend/package-lock.json` ещё не включён в ветку, поэтому воспроизводимая сборка остаётся блокером. Docker smoke выявил и подготовил исправление: одноразовому `db-migrate` нужны `DATABASE_URL` и `JWT_SECRET` для загрузки metadata/settings; Compose теперь передаёт owner URL и JWT, API по-прежнему использует только runtime credentials. Повторный CI проверит исправление. Backup/restore drill ещё не пройден; не запускайте production deployment до успешного полного smoke и восстановления.
+> **Технический статус 2026-11-09:** GitHub Actions commit `212aadf` подтвердил PostgreSQL 16 migrations/RLS, backend QA, frontend `npm ci`/audit/build на временном lockfile candidate, полный Compose smoke, least-privilege role separation и backup/restore drill (SHA-256 обоих архивов, восстановление БД на head `0032_processing_quality_rls` с 44 таблицами, документный sentinel). Единственный оставшийся CI blocker: `frontend/package-lock.json` не закоммичен в ветку; временный candidate доступен в artifact `13660698809`, но не является частью release branch. Статус остаётся NO-GO; production deployment запрещён.
 
 ## Назначение
 

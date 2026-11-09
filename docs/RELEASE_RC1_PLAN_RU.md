@@ -165,3 +165,16 @@ RC1 допускается только после зелёного CI по back
 ## Docker and backup gate update — 2026-11-09
 
 GitHub Actions commit `f95f478` passed image build, Compose startup/migrations, host-side API and web health, and DB role separation. Backup drill did not start: the tracked script is mode `100644` and workflow attempted direct execution (`Permission denied`). The gate now invokes it through Bash, as documented in this runbook. Checksums and database/document restore remain open pending CI. Frontend npm install/audit/build passed with a temporary generated lock; committed lockfile gate still fails.
+
+## Текущий результат release gate — 2026-11-09, commit `212aadf`
+
+| Ворота | Результат |
+|---|---|
+| PostgreSQL 16 migrations, повторный upgrade, release QA, RLS matrix, pip-audit | PASS |
+| Frontend npm ci, npm audit high, production build на runner-generated lockfile candidate | PASS |
+| Committed `frontend/package-lock.json` | FAIL — отсутствует в ветке |
+| Compose build/start, API/web loopback health, разделение DB ролей | PASS |
+| Backup SHA-256 и PostgreSQL/document restore | PASS — head `0032_processing_quality_rls`, 44 таблицы, sentinel PASS |
+| Production readiness | NO-GO — reproducible committed frontend lockfile gate remains open |
+
+Temporary npm candidate artifact: `13660698809`. Он подтверждает генерацию и тестирование настоящего lockfile через npm, но пока не входит в ветку.

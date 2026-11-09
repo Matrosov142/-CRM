@@ -134,3 +134,11 @@
 - Backup/restore stopped before creating the archive: `ops/backup-pilot.sh` is tracked as mode `100644`, while CI invoked it as an executable and got `Permission denied`.
 - Updated CI to invoke the script explicitly with `bash`, matching the runbook. Archive checksums, PostgreSQL restore, and document restore remain unverified until the next run.
 - `frontend/package-lock.json` is still missing from the branch; the temporary candidate did pass frontend install/audit/build.
+
+## Полный runtime и backup/restore gate — commit 212aadf
+
+- Backend/PostgreSQL 16 job прошёл: Alembic migration head применяется дважды, release QA/RLS matrix и Python dependency audit успешны.
+- Frontend candidate на GitHub runner прошёл `npm ci`, `npm audit --audit-level=high` и production build. Отдельный job намеренно обнаруживает отсутствие committed `frontend/package-lock.json` и поэтому оставляет release workflow красным.
+- Compose smoke прошёл: образы собраны, bootstrap/migration завершились, API и web отвечали через loopback host port, роли `potok_owner`/`potok_runtime` прошли проверки привилегий.
+- Backup/restore drill прошёл: `database.dump` и `documents.tar.gz` совпали с SHA-256; восстановленная БД имеет head `0032_processing_quality_rls` и 44 таблицы; документный sentinel восстановлен.
+- Единственный известный blocker PR gate: lockfile candidate не включён в ветку. Production readiness не подтверждена; **NO-GO** до committed lockfile и зелёного release workflow.
