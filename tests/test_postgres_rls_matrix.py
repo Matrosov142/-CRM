@@ -22,6 +22,9 @@ def test_every_company_scoped_table_has_forced_rls_and_policy():
     # auth_sessions is intentionally pre-tenant: auth validates JWT subject + company + JTI
     # before tenant context is established. All other company_id tables must be RLS protected.
     intentional_pre_tenant_tables = {"auth_sessions"}
+    # memberships stays ENABLEd with tenant/user policies but NO FORCE so its
+    # SECURITY DEFINER director-check function can inspect membership rows.
+    intentional_not_forced_tables = {"memberships"}
     with psycopg.connect(RUNTIME_URL) as conn:
         rows = conn.execute("""
             SELECT c.relname, c.relrowsecurity, c.relforcerowsecurity,
@@ -45,7 +48,7 @@ def test_every_company_scoped_table_has_forced_rls_and_policy():
     for table, enabled, forced, policy_count, policy_sql in rows:
         if table in intentional_pre_tenant_tables:
             continue
-        if not enabled or not forced:
+        if not enabled or (not forced and table not in intentional_not_forced_tables):
             failures.append(f"{table}: ENABLE/FORCE ROW LEVEL SECURITY is not active")
         if not policy_count:
             failures.append(f"{table}: no RLS policy exists")
