@@ -1,0 +1,180 @@
+name: POTOK CRM release gate
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master, 'release/**']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  backend-postgres:
+    timeout-minutes: 20
+    name: Backend + PostgreSQL 16 + RLS
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: potok_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d potok_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      DATABASE_URL: postgresql+psycopg://potok_runtime:potok_runtime_test_secret@localhost:5432/potok_test
+      MIGRATION_DATABASE_URL: postgresql+psycopg://potok_owner:potok_owner_test_secret@localhost:5432/potok_test
+      TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/potok_test
+      TEST_RUNTIME_DATABASE_URL: postgresql://potok_runtime:potok_runtime_test_secret@localhost:5432/potok_test
+      JWT_SECRET: ci-only-secret-not-for-production-000000000000
+      ENVIRONMENT: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - name: Install backend dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Audit Python dependencies
+        run: |
+          python -m pip install pip-audit
+          pip-audit -r requirements.txt
+      - name: Create separate non-superuser owner and runtime roles
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h localhost -U postgres -d potok_test -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE potok_owner LOGIN PASSWORD 'potok_owner_test_secret'
+            NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOREPLICATION NOBYPASSRLS;
+          CREATE ROLE potok_runtime LOGIN PASSWORD 'potok_runtime_test_secret'
+            NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOREPLICATION NOBYPASSRLS;
+          GRANT CONNECT ON DATABASE potok_test TO potok_owner, potok_runtime;
+          GRANT USAGE, CREATE ON SCHEMA public TO potok_owner;
+          GRANT USAGE ON SCHEMA public TO potok_runtime;
+          ALTER DEFAULT PRIVILEGES FOR ROLE potok_owner IN SCHEMA public
+            GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO potok_runtime;
+          ALTER DEFAULT PRIVILEGES FOR ROLE potok_owner IN SCHEMA public
+            GRANT USAGE, SELECT ON SEQUENCES TO potok_runtime;
+          SQL
+      - name: Apply migrations twice as non-superuser schema owner
+        run: |
+          alembic upgrade head
+          alembic upgrade head
+      - name: Grant runtime access to existing schema objects
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h localhost -U postgres -d potok_test -v ON_ERROR_STOP=1 <<'SQL'
+          GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO potok_runtime;
+          GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO potok_runtime;
+          REVOKE UPDATE, DELETE ON audit_events FROM potok_runtime;
+          SQL
+      - name: Run release QA including PostgreSQL RLS matrix
+        run: |
+          set -o pipefail
+          python tools/qa_release.py 2>&1 | tee docs/CI_QA_LOG.txt
+      - name: Upload backend QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: potok-backend-qa-evidence
+          path: |
+            docs/CI_QA_LOG.txt
+            docs/QA_REPORT_PILOT_0_25.json
+
+  frontend:
+    timeout-minutes: 15
+    name: Frontend reproducible production build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Require committed lockfile
+        run: test -f frontend/package-lock.json
+      - name: Install exact dependency tree
+        working-directory: frontend
+        run: npm ci
+      - name: Audit frontend dependencies
+        working-directory: frontend
+        run: npm audit --audit-level=high
+      - name: Build production frontend
+        working-directory: frontend
+        run: npm run build
+
+  docker-smoke:
+    timeout-minutes: 25
+    name: Docker Compose runtime smoke test
+    runs-on: ubuntu-latest
+    needs: [backend-postgres, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create CI-only secrets
+        run: |
+          umask 077
+          printf 'DB_ADMIN_PASSWORD=%s\nDB_OWNER_PASSWORD=%s\nRUNTIME_DB_PASSWORD=%s\nJWT_SECRET=%s\n' \
+            'ci-admin-password-not-for-production' \
+            'ci-owner-password-not-for-production' \
+            'ci-runtime-password-not-for-production' \
+            'ci-only-jwt-secret-not-for-production-000000000000' > .env.pilot
+      - name: Build and start full pilot stack
+        run: docker compose --env-file .env.pilot -f compose.pilot.yml up -d --build
+      - name: Remove completed secret-bearing bootstrap and migration containers
+        run: docker compose --env-file .env.pilot -f compose.pilot.yml rm -f db-bootstrap db-migrate
+      - name: Verify API and web health through reverse proxy
+        run: |
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:18080/api/v1/health/ready >/tmp/api-health.json \
+              && curl -fsS http://127.0.0.1:18080/healthz >/tmp/web-health.txt; then
+              cat /tmp/api-health.json
+              cat /tmp/web-health.txt
+              exit 0
+            fi
+            sleep 5
+          done
+          docker compose --env-file .env.pilot -f compose.pilot.yml ps
+          docker compose --env-file .env.pilot -f compose.pilot.yml logs --no-color
+          exit 1
+      - name: Verify PostgreSQL role separation in the running pilot stack
+        run: |
+          ROLE_FLAGS="$(docker compose --env-file .env.pilot -f compose.pilot.yml exec -T db sh -c 'PGPASSWORD="$POSTGRES_PASSWORD" psql -U potok_admin -d potok_crm -Atc "SELECT (SELECT rolsuper FROM pg_roles WHERE rolname = '\''potok_owner'\'')::text || '\''|'\'' || (SELECT rolbypassrls FROM pg_roles WHERE rolname = '\''potok_owner'\'')::text || '\''|'\'' || (SELECT rolsuper FROM pg_roles WHERE rolname = '\''potok_runtime'\'')::text || '\''|'\'' || (SELECT rolbypassrls FROM pg_roles WHERE rolname = '\''potok_runtime'\'')::text"')"
+          test "$ROLE_FLAGS" = "false|false|false|false"
+          OWNER_TABLES="$(docker compose --env-file .env.pilot -f compose.pilot.yml exec -T db sh -c 'PGPASSWORD="$POSTGRES_PASSWORD" psql -U potok_admin -d potok_crm -Atc "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='\''public'\'' AND c.relkind='\''r'\'' AND c.relowner=(SELECT oid FROM pg_roles WHERE rolname='\''potok_owner'\'')"')"
+          test "$OWNER_TABLES" -gt 0
+          API_ENV_NAMES="$(docker compose --env-file .env.pilot -f compose.pilot.yml exec -T api sh -c 'env | cut -d= -f1')"
+          ! printf '%s\n' "$API_ENV_NAMES" | grep -E '^(DB_ADMIN_PASSWORD|DB_OWNER_PASSWORD|MIGRATION_DATABASE_URL)$'
+      - name: Run backup, checksum, database restore and document restore drill
+        run: |
+          docker compose --env-file .env.pilot -f compose.pilot.yml exec -T api sh -c 'mkdir -p /var/lib/potok-crm/documents/rc1-drill && printf "rc1-backup-ok" > /var/lib/potok-crm/documents/rc1-drill/sentinel.txt'
+          BACKUP_DIR=./backups ./ops/backup-pilot.sh
+          BACKUP_PATH="$(find ./backups -mindepth 1 -maxdepth 1 -type d | head -n 1)"
+          (cd "$BACKUP_PATH" && sha256sum -c SHA256SUMS)
+          test -s "$BACKUP_PATH/database.dump"
+          test -s "$BACKUP_PATH/documents.tar.gz"
+          docker compose --env-file .env.pilot -f compose.pilot.yml exec -T db sh -c 'PGPASSWORD="$POSTGRES_PASSWORD" createdb -U potok_admin potok_restore_test'
+          cat "$BACKUP_PATH/database.dump" | docker compose --env-file .env.pilot -f compose.pilot.yml exec -T db sh -c 'PGPASSWORD="$POSTGRES_PASSWORD" pg_restore --exit-on-error -U potok_admin -d potok_restore_test --no-owner'
+          RESTORED_HEAD="$(docker compose --env-file .env.pilot -f compose.pilot.yml exec -T db sh -c 'PGPASSWORD="$POSTGRES_PASSWORD" psql -U potok_admin -d potok_restore_test -Atc "SELECT version_num FROM alembic_version"')"
+          test "$RESTORED_HEAD" = "0031_rfq_tender_position_link"
+          RESTORED_TABLES="$(docker compose --env-file .env.pilot -f compose.pilot.yml exec -T db sh -c 'PGPASSWORD="$POSTGRES_PASSWORD" psql -U potok_admin -d potok_restore_test -Atc "SELECT count(*) FROM information_schema.tables WHERE table_schema = '\''public'\'' AND table_type = '\''BASE TABLE'\''"')"
+          test "$RESTORED_TABLES" -gt 0
+          mkdir -p /tmp/potok-documents-restored
+          tar -xzf "$BACKUP_PATH/documents.tar.gz" -C /tmp/potok-documents-restored
+          test "$(cat /tmp/potok-documents-restored/documents/rc1-drill/sentinel.txt)" = "rc1-backup-ok"
+          echo "Database restore head: $RESTORED_HEAD ($RESTORED_TABLES tables)"
+          echo "Document restore sentinel: PASS"
+      - name: Tear down CI stack and disposable volumes
+        if: always()
+        run: |
+          docker compose --env-file .env.pilot -f compose.pilot.yml down -v --remove-orphans || true
+          rm -f .env.pilot
+          rm -rf ./backups

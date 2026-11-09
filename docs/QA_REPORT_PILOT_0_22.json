@@ -1,0 +1,31 @@
+{
+  "release": "0.23.0-pilot",
+  "generated_at_utc": "2026-11-08T16:36:17.965107+00:00",
+  "python_files": 136,
+  "compileall": {
+    "passed": true,
+    "output": ""
+  },
+  "static_audit": {
+    "passed": true,
+    "output": "Python files syntax-checked: 136\nAlembic revisions: 31; roots: 1; branches: 0\nFastAPI version: 0.23.0-pilot\n[ACTION REQUIRED] Dashboard KPIs are hard-coded demo values; they are not live CRM metrics.\nRESULT: PASS — static release audit only; no runtime, database, RLS or security penetration tests performed.\n"
+  },
+  "selected_tests": {
+    "passed": false,
+    "files_run": 50,
+    "excluded_due_to_environment": [
+      "test_postgres_rls_integration.py"
+    ],
+    "output": "........................................................................ [ 38%]\n........................................F..F............................ [ 76%]\n............................F..F............                             [100%]\n=================================== FAILURES ===================================\n____________________ test_release_versions_are_synchronized ____________________\n\n    def test_release_versions_are_synchronized():\n        main = (ROOT / \"app/main.py\").read_text()\n        audit = (ROOT / \"tools/release_audit.py\").read_text()\n        runner = (ROOT / \"tools/qa_release.py\").read_text()\n>       assert 'version=\"0.22.0-pilot\"' in main\nE       assert 'version=\"0.22.0-pilot\"' in 'from fastapi import FastAPI\\nfrom fastapi.middleware.cors import CORSMiddleware\\nfrom app.config import settings\\nfro...et(\"/\")\\ndef root():\\n    return {\"name\": settings.app_name, \"version\": app.version, \"status\": settings.environment}\\n'\n\ntests/test_release_qa_v3_6.py:10: AssertionError\n______ test_release_audit_runs_browser_session_gates_before_final_result _______\n\n    def test_release_audit_runs_browser_session_gates_before_final_result():\n        audit = (ROOT / \"tools/release_audit.py\").read_text()\n        session_gate = audit.index(\"Browser session inventory and individual revocation.\")\n        final_result = audit.index(\"print('RESULT: PASS\")\n        assert session_gate < final_result\n        assert \"loadBrowserSessions\" in audit\n        assert \"revokeBrowserSession\" in audit\n>       assert \"ПИЛОТ 0.22\" in audit\nE       assert 'ПИЛОТ 0.22' in '#!/usr/bin/env python3\\n\"\"\"Offline release audit. Static checks only; never connects to a database/server.\"\"\"\\nfrom _...nt(\\'RESULT: PASS — static release audit only; no runtime, database, RLS or security penetration tests performed.\\')\\n'\n\ntests/test_release_qa_v3_6.py:37: AssertionError\n_____________ test_tender_router_is_registered_and_version_bumped ______________\n\n    def test_tender_router_is_registered_and_version_bumped():\n        main = (ROOT / \"app/main.py\").read_text()\n        assert \"app.include_router(tenders.router)\" in main\n>       assert 'version=\"0.22.0-pilot\"' in main\nE       assert 'version=\"0.22.0-pilot\"' in 'from fastapi import FastAPI\\nfrom fastapi.middleware.cors import CORSMiddleware\\nfrom app.config import settings\\nfro...et(\"/\")\\ndef root():\\n    return {\"name\": settings.app_name, \"version\": app.version, \"status\": settings.environment}\\n'\n\ntests/test_tender_register_v0_16.py:58: AssertionError\n____________________ test_release_versions_are_synchronized ____________________\n\n    def test_release_versions_are_synchronized():\n        main = (ROOT / \"app/main.py\").read_text(encoding=\"utf-8\")\n        pkg = (ROOT / \"frontend/package.json\").read_text(encoding=\"utf-8\")\n        audit = (ROOT / \"tools/release_audit.py\").read_text(encoding=\"utf-8\")\n>       assert 'version=\"0.22.0-pilot\"' in main\nE       assert 'version=\"0.22.0-pilot\"' in 'from fastapi import FastAPI\\nfrom fastapi.middleware.cors import CORSMiddleware\\nfrom app.config import settings\\nfro...et(\"/\")\\ndef root():\\n    return {\"name\": settings.app_name, \"version\": app.version, \"status\": settings.environment}\\n'\n\ntests/test_tender_ui_v0_17.py:29: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_release_qa_v3_6.py::test_release_versions_are_synchronized - assert 'version=\"0.22.0-pilot\"' in 'from fastapi import FastAPI\\nfrom fastapi.middleware.cors import CORSMiddleware\\nfrom app.config import settings\\nfro...et(\"/\")\\ndef root():\\n    return {\"name\": settings.app_name, \"version\": app.version, \"status\": settings.environment}\\n'\nFAILED tests/test_release_qa_v3_6.py::test_release_audit_runs_browser_session_gates_before_final_result - assert 'ПИЛОТ 0.22' in '#!/usr/bin/env python3\\n\"\"\"Offline release audit. Static checks only; never connects to a database/server.\"\"\"\\nfrom _...nt(\\'RESULT: PASS — static release audit only; no runtime, database, RLS or security penetration tests performed.\\')\\n'\nFAILED tests/test_tender_register_v0_16.py::test_tender_router_is_registered_and_version_bumped - assert 'version=\"0.22.0-pilot\"' in 'from fastapi import FastAPI\\nfrom fastapi.middleware.cors import CORSMiddleware\\nfrom app.config import settings\\nfro...et(\"/\")\\ndef root():\\n    return {\"name\": settings.app_name, \"version\": app.version, \"status\": settings.environment}\\n'\nFAILED tests/test_tender_ui_v0_17.py::test_release_versions_are_synchronized - assert 'version=\"0.22.0-pilot\"' in 'from fastapi import FastAPI\\nfrom fastapi.middleware.cors import CORSMiddleware\\nfrom app.config import settings\\nfro...et(\"/\")\\ndef root():\\n    return {\"name\": settings.app_name, \"version\": app.version, \"status\": settings.environment}\\n'\n4 failed, 184 passed in 1.01s\n"
+  },
+  "postgresql_integration": {
+    "configured": false,
+    "status": "not run: requires psycopg and disposable TEST_ADMIN_DATABASE_URL / TEST_RUNTIME_DATABASE_URL"
+  },
+  "frontend": {
+    "package_lock_present": false,
+    "production_build": "not run: package-lock.json absent or npm dependencies unavailable"
+  },
+  "docker_runtime": "not run: Docker CLI/daemon unavailable in build environment",
+  "production_ready": false
+}

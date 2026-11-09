@@ -1,0 +1,27 @@
+{
+  "release": "0.7.0-pilot",
+  "generated_at_utc": "2026-11-08T14:42:49.254648+00:00",
+  "python_files": 113,
+  "compileall": {
+    "passed": true,
+    "output": ""
+  },
+  "static_audit": {
+    "passed": true,
+    "output": "Python files syntax-checked: 113\nAlembic revisions: 24; roots: 1; branches: 0\nFastAPI version: 0.7.0-pilot\n[ACTION REQUIRED] Frontend stores access token in localStorage; before production, migrate to secure HttpOnly cookie/session design and CSRF protections.\n[ACTION REQUIRED] Dashboard KPIs are hard-coded demo values; they are not live CRM metrics.\nRESULT: PASS — static release audit only; no runtime, database, RLS or security penetration tests performed.\n"
+  },
+  "selected_tests": {
+    "passed": true,
+    "files_run": 36,
+    "excluded_due_to_environment": [
+      "test_operation_controls.py",
+      "test_postgres_rls_integration.py"
+    ],
+    "output": "........................................................................ [ 58%]\n....................................................                     [100%]\n124 passed in 0.31s\n"
+  },
+  "postgresql_integration": {
+    "configured": false,
+    "status": "not run: requires psycopg and disposable TEST_ADMIN_DATABASE_URL / TEST_RUNTIME_DATABASE_URL"
+  },
+  "production_ready": false
+}

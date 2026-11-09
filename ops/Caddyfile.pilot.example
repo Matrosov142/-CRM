@@ -1,0 +1,13 @@
+# Add as a separate site block only after a backup of the active Caddyfile.
+# Replace crm.example.ru with a domain you control and point its DNS A/AAAA record
+# to this server. Do not overwrite existing site blocks.
+crm.example.ru {
+    encode zstd gzip
+    reverse_proxy 127.0.0.1:18080
+    header {
+        X-Content-Type-Options nosniff
+        Referrer-Policy strict-origin-when-cross-origin
+        X-Frame-Options DENY
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    }
+}

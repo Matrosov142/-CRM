@@ -1,0 +1,52 @@
+{
+  "release": "0.25.0-pilot",
+  "generated_at_utc": "2026-11-08T17:30:24.548860+00:00",
+  "python_files": 142,
+  "compileall": {
+    "passed": true,
+    "output": ""
+  },
+  "static_audit": {
+    "passed": true,
+    "output": "Python files syntax-checked: 142\nAlembic revisions: 31; roots: 1; branches: 0\nFastAPI version: 0.25.0-pilot\n[ACTION REQUIRED] Dashboard KPIs are hard-coded demo values; they are not live CRM metrics.\nRESULT: PASS — static release audit only; no runtime, database, RLS or security penetration tests performed.\n"
+  },
+  "selected_tests": {
+    "passed": true,
+    "files_run": 55,
+    "excluded_due_to_environment": [
+      "test_postgres_rls_integration.py",
+      "test_postgres_rls_matrix.py"
+    ],
+    "output": "........................................................................ [ 33%]\n........................................................................ [ 67%]\n....................................................................     [100%]\n212 passed in 1.46s\n"
+  },
+  "postgresql_integration": {
+    "configured": false,
+    "status": "not run: requires psycopg and disposable TEST_ADMIN_DATABASE_URL / TEST_RUNTIME_DATABASE_URL"
+  },
+  "frontend": {
+    "package_lock_present": false,
+    "production_build": "not run: package-lock.json absent or npm dependencies unavailable"
+  },
+  "docker_runtime": "not run: Docker CLI/daemon unavailable in build environment",
+  "production_ready": false,
+  "technical_preflight_2026_11_09": {
+    "source_archive": "POTOK_CRM_v0.25.2(1).zip; extracted and inspected",
+    "workflow_defect": "fixed: set -o pipefail added to QA tee pipeline; contract assertion added; test not executed",
+    "frontend": {
+      "package_json_valid": true,
+      "package_lock_present": false,
+      "npm_available": false,
+      "node_available": true,
+      "pnpm_available": true,
+      "npm_ci_or_lock_generation": "not run; npm absent; pnpm lockfile incompatible with npm ci"
+    },
+    "backend_tests": "not run: Python/pytest unavailable",
+    "compileall": "not run: Python unavailable",
+    "static_audit": "not run: Python unavailable",
+    "yaml_shell_checks": "not run: YAML parser and Bash unavailable",
+    "postgresql_rls": "not run: PostgreSQL/psql and Python unavailable",
+    "docker_compose_smoke": "not run: Docker CLI unavailable",
+    "backup_restore": "not run: Docker/Bash unavailable",
+    "production_ready": false
+  }
+}

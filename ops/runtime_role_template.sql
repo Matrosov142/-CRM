@@ -1,0 +1,20 @@
+-- Execute as the PostgreSQL bootstrap administrator on a disposable database.
+-- Replace placeholders and inject passwords through a secret manager; never commit them.
+CREATE ROLE potok_owner LOGIN PASSWORD '<OWNER_PASSWORD>'
+  NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOREPLICATION NOBYPASSRLS;
+CREATE ROLE potok_runtime LOGIN PASSWORD '<RUNTIME_PASSWORD>'
+  NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOREPLICATION NOBYPASSRLS;
+
+GRANT CONNECT ON DATABASE <DATABASE_NAME> TO potok_owner, potok_runtime;
+GRANT USAGE, CREATE ON SCHEMA public TO potok_owner;
+GRANT USAGE ON SCHEMA public TO potok_runtime;
+
+ALTER DEFAULT PRIVILEGES FOR ROLE potok_owner IN SCHEMA public
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO potok_runtime;
+ALTER DEFAULT PRIVILEGES FOR ROLE potok_owner IN SCHEMA public
+  GRANT USAGE, SELECT ON SEQUENCES TO potok_runtime;
+
+-- After migrations:
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO potok_runtime;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO potok_runtime;
+REVOKE UPDATE, DELETE ON audit_events FROM potok_runtime;
