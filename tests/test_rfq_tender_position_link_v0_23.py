@@ -37,6 +37,7 @@ def test_rfq_line_model_has_same_company_composite_link_and_pair_check():
 
 def test_rfq_detail_returns_tender_position_references():
     source = (ROOT / "app/routers/suppliers.py").read_text()
+    assert '"lines": [{"id": str(x.id), "line_number": x.line_number' in source
     assert '"tender_position_id": str(x.tender_position_id) if x.tender_position_id else None' in source
     assert "Позиция тендера не найдена в вашей компании" in source
     assert "Наименование строки запроса не совпадает" in source

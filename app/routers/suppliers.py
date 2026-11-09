@@ -207,7 +207,7 @@ def get_rfq(
         "id": str(rfq.id), "rfq_number": rfq.rfq_number, "title": rfq.title,
         "message": rfq.message, "status": rfq.status,
         "response_deadline": rfq.response_deadline.isoformat() if rfq.response_deadline else None,
-        "lines": [{"line_number": x.line_number, "item_name": x.item_name,
+        "lines": [{"id": str(x.id), "line_number": x.line_number, "item_name": x.item_name,
                    "specification": x.specification, "quantity": str(x.quantity), "unit": x.unit,
                    "tender_id": str(x.tender_id) if x.tender_id else None,
                    "tender_position_id": str(x.tender_position_id) if x.tender_position_id else None} for x in lines],
