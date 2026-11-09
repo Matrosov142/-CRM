@@ -117,12 +117,11 @@ def test_browser_release_gate_business_and_security():
         expect(api(page, f"/api/v1/rfqs/{rfq['id']}/selections", "POST", {"offer_id":offer["id"],"rfq_line_id":rfq_line["id"],"note":"E2E"}))
         draft = expect(api(page, f"/api/v1/rfqs/{rfq['id']}/create-procurement-drafts", "POST", {}), 201)["orders"][0]
         assert Decimal(draft["total_amount"]) == Decimal("1000.00")
-        expect(api(page, f"/api/v1/procurement/orders/{draft['id']}/authorize", "POST", {"approval_request_id":None}))
+        expect(api(page, f"/api/v1/procurement/orders/{draft['id']}/authorize", "POST", {"approval_request_id":None}), 409)
         order = expect(api(page, f"/api/v1/procurement/orders/{draft['id']}"))
         line = order["lines"][0]
         members = expect(api(page, "/api/v1/employees"))
         director = next(m for m in members if m["role"] == "director")
-        expect(api(page, f"/api/v1/procurement/orders/{draft['id']}/authorize", "POST", {"approval_request_id":None}), 409)
         expect(api(page, f"/api/v1/access/employees/{director['id']}/limits", "PUT", {
             "operation":"purchase","limit_amount":"2000.00"
         }))
