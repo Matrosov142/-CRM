@@ -126,3 +126,7 @@
  - Функциональная схема и миграции изменены после CI RLS проверки; текущий head — `0032_processing_quality_rls`.
 - Все прежние блокеры сохраняются: PostgreSQL/RLS runtime, npm lockfile и production build, browser E2E, Docker runtime, backup/restore, penetration testing, legal review и функциональная приёмка.
 - До закрытия блокеров `production_ready=false`; реальные данные не использовать.
+
+## Актуальное состояние — 2026-11-09, commit d736f94db43a6120f557f3125a90fea408ecebf7
+
+GitHub Actions Release Gate run [42593724186](https://github.com/Matrosov142/-CRM/actions/runs/42593724186) завершился успешно: PostgreSQL 16 migration/RLS/backend QA, frontend committed lockfile/npm ci/audit/build, lockfile assertion и Docker Compose health/roles/backup/restore. Ранее приведённые локальные ограничения и промежуточные падения ниже являются историей, а не текущим состоянием этих ворот. Открытыми остаются browser E2E, независимый security review, функциональная и юридическая/hosting приёмка. PR #1 не слит; production deployment не выполнялся.

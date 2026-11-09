@@ -15,15 +15,15 @@
   },
   "python_files_compile_checked": 142,
   "automated_tests": "212 passed across 55 selected test files; PostgreSQL RLS integration excluded in offline build environment.",
-  "postgresql_runtime_integration": "passed in GitHub Actions add8210: migrations twice, release QA and RLS matrix",
-  "docker_build": "passed in GitHub Actions add8210: Compose images built and stack health verified",
-  "frontend_build": "passed with committed frontend/package-lock.json: npm ci, npm audit --audit-level=high, npm run build",
+  "postgresql_runtime_integration": "PASS in GitHub Actions workflow run 42593724186 (head d736f94db43a6120f557f3125a90fea408ecebf7): PostgreSQL 16 migrations twice, backend QA and RLS matrix.",
+  "docker_build": "PASS in GitHub Actions workflow run 42593724186: full Compose build/start, API/web health, role separation and backup/restore.",
+  "frontend_build": "PASS in run 42593724186: committed lockfile, npm ci, npm audit --audit-level=high, npm run build.",
   "server_deployment": "not performed; no remote shell access and no confirmed Russian VPS",
   "static_audit": "passed; 142 Python files syntax checked; 32 Alembic revisions; one root, no branches.",
   "compose_yaml": "parsed successfully",
   "shell_scripts": "bash -n passed",
   "docker_image_build": "passed in GitHub Actions commit 212aadf",
-  "frontend_production_build": "passed with committed lockfile on add8210",
+  "frontend_production_build": "PASS with committed lockfile in run 42593724186.",
   "changes": [
     "Added tenant-scoped GET /api/v1/warehouse/reservations with reservation line IDs and remaining quantities, enabling the shipment UI/client to retrieve exact reservation_line_id values for partial shipments.",
     "Added read-only ETP platform registry API for B2B-Center, RTS-Tender, Fabrikant, Sber A and TEK-Torg; clearly reports all connectors as planned/unverified and refuses connection attempts until official API and contractual permissions are verified.",
@@ -92,9 +92,9 @@
     "processing job/operation/material ORM metadata models"
   ],
   "migration_head": "0032_processing_quality_rls",
-  "release_notes": "RC1 preparation hardening only. GitHub Actions commit 212aadf: PostgreSQL/RLS and Python dependency audit PASS; frontend npm ci/audit/build PASS on temporary lockfile candidate; Docker Compose, role separation, backup checksums, database restore (0032_processing_quality_rls, 44 tables) and document sentinel restore PASS. frontend/package-lock.json is not committed, so the release gate remains NO-GO. production_ready=false.",
+  "release_notes": "RC1 technical preparation only. GitHub Actions Release Gate run 42593724186 on d736f94db43a6120f557f3125a90fea408ecebf7 passed all four jobs: PostgreSQL/RLS/backend QA, frontend npm ci/audit/build, committed-lockfile assertion, Compose health/roles/backup/restore (database head 0032_processing_quality_rls, 44 tables, document sentinel). Browser E2E, independent security review, functional and legal/hosting acceptance remain open; production_ready=false.",
   "release_blockers": "docs/RELEASE_BLOCKERS_RU.md",
-  "docker_runtime": "passed: API and web loopback health, role separation, backup/restore drill",
+  "docker_runtime": "PASS in GitHub Actions run 42593724186: API/web loopback health, DB role separation, backup and database/document restore drill.",
   "qa": "docs/QA_REPORT_PILOT_0_25.json",
   "release_name": "POTOK CRM RC1 Preparation v0.25",
   "qa_summary": {
@@ -104,10 +104,10 @@
     "selected_test_files": 55,
     "static_audit": "passed",
     "sqlalchemy_metadata": "SQLite Base.metadata.create_all passed; 43 tables (inherited from v0.24; not PostgreSQL runtime)",
-    "frontend_tsx_syntax": "TypeScript syntax transpilation only; production build not run",
-    "postgresql_rls_runtime": "passed in GitHub Actions add8210",
+    "frontend_tsx_syntax": "Production build passed with npm ci and committed lockfile in GitHub Actions run 42593724186.",
+    "postgresql_rls_runtime": "PASS in GitHub Actions run 42593724186: migrations twice, release QA and RLS matrix.",
     "frontend_production_build": "passed with committed lockfile: npm ci, npm audit high, production build",
-    "docker_runtime": "passed Compose startup, API/web health and role checks in GitHub Actions",
+    "docker_runtime": "PASS in GitHub Actions run 42593724186: Compose startup, API/web health and role checks.",
     "selected_test_count": 212,
     "compose_yaml": "parsed successfully; services db, db-bootstrap, db-migrate, api, web",
     "shell_scripts": "bash -n passed; workflow run blocks passed bash -n",
@@ -119,19 +119,19 @@
     "workflow_defect": "fixed: set -o pipefail added to QA tee pipeline; contract assertion added; test not executed",
     "frontend": {
       "package_json_valid": true,
-      "package_lock_present": false,
+      "package_lock_present": true,
       "npm_available": false,
       "node_available": true,
       "pnpm_available": true,
-      "npm_ci_or_lock_generation": "not run; npm absent; pnpm lockfile incompatible with npm ci"
+      "npm_ci_or_lock_generation": "Initial local preflight lacked npm; superseded by committed verified lockfile and passing npm ci/audit/build in GitHub Actions run 42593724186."
     },
-    "backend_tests": "not run: Python/pytest unavailable",
-    "compileall": "not run: Python unavailable",
-    "static_audit": "not run: Python unavailable",
-    "yaml_shell_checks": "not run: YAML parser and Bash unavailable",
-    "postgresql_rls": "not run: PostgreSQL/psql and Python unavailable",
-    "docker_compose_smoke": "not run: Docker CLI unavailable",
-    "backup_restore": "not run: Docker/Bash unavailable",
+    "backend_tests": "Local Python/pytest unavailable; GitHub Actions backend QA and PostgreSQL RLS integration passed in run 42593724186.",
+    "compileall": "Local Python unavailable; GitHub Actions compileall passed in run 42593724186.",
+    "static_audit": "Local Python unavailable; GitHub Actions static/release QA passed in run 42593724186.",
+    "yaml_shell_checks": "Local parser/Bash unavailable; workflow checks passed in GitHub Actions run 42593724186.",
+    "postgresql_rls": "Local PostgreSQL/Python unavailable; GitHub Actions PostgreSQL 16 migrations and RLS matrix passed in run 42593724186.",
+    "docker_compose_smoke": "Local Docker unavailable; GitHub Actions Compose smoke passed in run 42593724186.",
+    "backup_restore": "Local Docker/Bash unavailable; GitHub Actions backup checksum and database/document restore drill passed in run 42593724186.",
     "production_ready": false
   },
   "last_completed_github_actions": {
@@ -143,11 +143,13 @@
     "frontend_npm_ci": "passed, 70 packages added and 71 audited",
     "release_workflow": "success",
     "lockfile_commit": "passed, version 3, 121 package entries",
-    "commit": "add821087123d83619ed360aba9b5e9ddbfc0ec4",
+    "commit": "d736f94db43a6120f557f3125a90fea408ecebf7",
     "backend_postgresql_rls": "passed",
     "backup_sha256": "passed for database.dump and documents.tar.gz",
-    "document_restore": "sentinel passed"
+    "document_restore": "sentinel passed",
+    "run_id": 42593724186,
+    "run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42593724186"
   },
-  "current_branch_changes_pending_ci": "none",
-  "remaining_release_acceptance": "Browser E2E, independent security review, functional acceptance and legal/hosting review remain outside the completed CI Release Gate"
+  "current_branch_changes_pending_ci": "none at d736f94; four Release Gate jobs passed.",
+  "remaining_release_acceptance": "Browser E2E, independent security review, functional acceptance and legal/hosting review remain."
 }

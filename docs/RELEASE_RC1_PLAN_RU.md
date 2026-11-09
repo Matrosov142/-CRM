@@ -1,14 +1,14 @@
 # ПОТОК CRM — план допуска к Release Candidate 1
 
 **Текущая базовая версия:** `0.25.0-pilot`  
-**Статус:** полный GitHub Actions Release Gate `PASS` на commit `add8210`; общий допуск RC1/production остаётся `NO-GO` до закрытия остальных приёмочных ворот.
+**Статус:** полный GitHub Actions Release Gate `PASS` на commit `d736f94` (run 42593724186); общий допуск RC1/production остаётся `NO-GO` до закрытия остальных приёмочных ворот.
 **Правило:** ни один пункт не закрывается по наличию кода или статическому анализу. Нужен воспроизводимый лог успешной проверки.
 
 ## 1. Контрольные ворота RC1
 
 | Ворота | Что считается доказательством | Текущий статус |
 |---|---|---|
-| Backend regression | Полный QA runner, все тесты, включая PostgreSQL suite | PASS в GitHub Actions `add8210` |
+| Backend regression | Полный QA runner, все тесты, включая PostgreSQL suite | PASS в GitHub Actions run 42593724186 (`d736f94`) |
 | PostgreSQL migrations | Чистая PostgreSQL 16 DB: `alembic upgrade head`; повторный запуск без ошибок | PASS: upgrade выполнен дважды |
 | Least privilege | `potok_runtime` не владелец, не SUPERUSER, без BYPASSRLS; права проверены SQL | PASS в Compose smoke |
 | Tenant isolation | Положительные и отрицательные cross-tenant тесты по tenant-owned сущностям | RLS matrix и PostgreSQL integration прошли в CI |
@@ -184,3 +184,7 @@ Temporary npm candidate artifact: `13660698809`. Он подтверждает �
 Все job полного workflow завершились успешно: PostgreSQL/backend/RLS, frontend reproducible build, проверка committed lockfile и Docker Compose smoke. Закоммиченный npm lockfile v3 прошёл `npm ci`, `npm audit --audit-level=high` и production build. Backup/restore подтвердил SHA-256, восстановление БД на `0032_processing_quality_rls` (44 таблицы) и восстановление документного sentinel.
 
 CI Release Gate: **PASS**. Общий статус допуска RC1/production: **NO-GO** до browser E2E, независимого security review, функциональной и юридической/hosting приёмки. PR остаётся открытым и не слит в `main`.
+
+## Актуальное состояние — 2026-11-09, commit d736f94db43a6120f557f3125a90fea408ecebf7
+
+GitHub Actions Release Gate run [42593724186](https://github.com/Matrosov142/-CRM/actions/runs/42593724186) завершился успешно: PostgreSQL 16 migration/RLS/backend QA, frontend committed lockfile/npm ci/audit/build, lockfile assertion и Docker Compose health/roles/backup/restore. Ранее приведённые локальные ограничения и промежуточные падения ниже являются историей, а не текущим состоянием этих ворот. Открытыми остаются browser E2E, независимый security review, функциональная и юридическая/hosting приёмка. PR #1 не слит; production deployment не выполнялся.

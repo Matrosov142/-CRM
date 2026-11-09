@@ -150,3 +150,7 @@
 - Полный GitHub Actions Release Gate завершился **success**: PostgreSQL 16 migrations/RLS/backend QA, frontend reproducible build, committed-lockfile check и Docker Compose smoke.
 - Compose smoke проверил API/web через loopback reverse proxy, least-privilege DB роли, SHA-256 backup обоих архивов, PostgreSQL restore на `0032_processing_quality_rls` (44 таблицы) и восстановление файлового sentinel.
 - CI-блокеры закрыты. Production readiness не заявляется: browser E2E, независимый security review, функциональная и юридическая/hosting приёмка остаются отдельными воротами. PR #1 не слит, production deployment не выполнялся.
+
+## Актуальное состояние — 2026-11-09, commit d736f94db43a6120f557f3125a90fea408ecebf7
+
+GitHub Actions Release Gate run [42593724186](https://github.com/Matrosov142/-CRM/actions/runs/42593724186) завершился успешно: PostgreSQL 16 migration/RLS/backend QA, frontend committed lockfile/npm ci/audit/build, lockfile assertion и Docker Compose health/roles/backup/restore. Ранее приведённые локальные ограничения и промежуточные падения ниже являются историей, а не текущим состоянием этих ворот. Открытыми остаются browser E2E, независимый security review, функциональная и юридическая/hosting приёмка. PR #1 не слит; production deployment не выполнялся.

@@ -1,6 +1,6 @@
 {
   "release": "0.25.0-pilot",
-  "generated_at_utc": "2026-11-09T09:28:06+00:00",
+  "generated_at_utc": "2026-11-09T16:29:18+07:00",
   "python_files": 142,
   "compileall": {
     "passed": true,
@@ -8,7 +8,7 @@
   },
   "static_audit": {
     "passed": true,
-    "output": "Python files syntax-checked: 142\nAlembic revisions: 31; roots: 1; branches: 0\nFastAPI version: 0.25.0-pilot\n[ACTION REQUIRED] Dashboard KPIs are hard-coded demo values; they are not live CRM metrics.\nRESULT: PASS — static release audit only; no runtime, database, RLS or security penetration tests performed.\n"
+    "output": "Python files syntax-checked: 142\nAlembic revisions: 32; roots: 1; branches: 0\nFastAPI version: 0.25.0-pilot\n[ACTION REQUIRED] Dashboard KPIs are hard-coded demo values; they are not live CRM metrics.\nRESULT: PASS — static release audit only; no runtime, database, RLS or security penetration tests performed.\n"
   },
   "selected_tests": {
     "passed": true,
@@ -20,7 +20,7 @@
     "output": "........................................................................ [ 33%]\n........................................................................ [ 67%]\n....................................................................     [100%]\n212 passed in 1.46s\n"
   },
   "postgresql_integration": {
-    "status": "passed in GitHub Actions add8210: PostgreSQL 16 migration upgrade twice, release QA and RLS matrix",
+    "status": "passed in GitHub Actions run 42593724186 at d736f94: PostgreSQL 16 migrations twice, release QA and RLS matrix",
     "configured": true
   },
   "frontend": {
@@ -29,26 +29,26 @@
     "production_build": "passed with committed lockfile: npm ci (70 packages), npm audit --audit-level=high (71 audited), npm run build",
     "package_lock_version": 3
   },
-  "docker_runtime": "passed in GitHub Actions add8210: full Compose build/start, migration, API/web host health and least-privilege role checks",
+  "docker_runtime": "passed in GitHub Actions run 42593724186: full Compose build/start, API/web health, role separation, backup/restore",
   "production_ready": false,
   "technical_preflight_2026_11_09": {
     "source_archive": "POTOK_CRM_v0.25.2(1).zip; extracted and inspected",
     "workflow_defect": "fixed: set -o pipefail added to QA tee pipeline; contract assertion added; test not executed",
     "frontend": {
       "package_json_valid": true,
-      "package_lock_present": false,
+      "package_lock_present": true,
       "npm_available": false,
       "node_available": true,
       "pnpm_available": true,
-      "npm_ci_or_lock_generation": "not run; npm absent; pnpm lockfile incompatible with npm ci"
+      "npm_ci_or_lock_generation": "Initial local preflight lacked npm; superseded by committed lockfile and passing CI npm ci/audit/build in run 42593724186."
     },
-    "backend_tests": "not run: Python/pytest unavailable",
-    "compileall": "not run: Python unavailable",
-    "static_audit": "not run: Python unavailable",
-    "yaml_shell_checks": "not run: YAML parser and Bash unavailable",
-    "postgresql_rls": "not run: PostgreSQL/psql and Python unavailable",
-    "docker_compose_smoke": "not run: Docker CLI unavailable",
-    "backup_restore": "not run: Docker/Bash unavailable",
+    "backend_tests": "Local Python/pytest unavailable; backend QA passed in GitHub Actions run 42593724186.",
+    "compileall": "Local Python unavailable; compileall passed in GitHub Actions run 42593724186.",
+    "static_audit": "Local Python unavailable; CI static/release audit passed in GitHub Actions run 42593724186.",
+    "yaml_shell_checks": "Local parser/Bash unavailable; workflow YAML and shell checks passed in GitHub Actions run 42593724186.",
+    "postgresql_rls": "Local PostgreSQL/Python unavailable; CI migrations and PostgreSQL RLS integration passed in GitHub Actions run 42593724186.",
+    "docker_compose_smoke": "Local Docker unavailable; Compose smoke passed in GitHub Actions run 42593724186.",
+    "backup_restore": "Local Docker/Bash unavailable; backup checksum and database/document restore passed in GitHub Actions run 42593724186.",
     "production_ready": false
   },
   "last_completed_github_run": {
@@ -57,15 +57,17 @@
     "docker_compose": "passed image build/start, API and web loopback health",
     "production_ready": false,
     "release_workflow": "success: all four jobs passed",
-    "commit": "add821087123d83619ed360aba9b5e9ddbfc0ec4",
+    "commit": "d736f94db43a6120f557f3125a90fea408ecebf7",
     "role_separation": "passed: owner/runtime role flags and API credential boundary",
     "backend_postgresql_rls": "passed: migrations twice, release QA, RLS matrix, pip-audit",
-    "backup_restore": "passed: both SHA-256 checks, DB restored to 0032_processing_quality_rls (44 tables), document sentinel restored"
+    "backup_restore": "passed: both SHA-256 checks, DB restored to 0032_processing_quality_rls (44 tables), document sentinel restored",
+    "run_id": 42593724186,
+    "run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42593724186"
   },
   "current_branch_changes_pending_ci": {
-    "commit": "none",
+    "commit": "none at d736f94",
     "remaining_release_acceptance": "browser E2E, independent security review, functional and legal/hosting acceptance",
-    "status": "all GitHub Actions jobs passed on add8210",
+    "status": "all four Release Gate jobs passed in run 42593724186",
     "production_ready": false
   }
 }

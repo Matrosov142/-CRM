@@ -1,6 +1,6 @@
 # ПОТОК CRM — запуск технического пилота 0.1
 
-> **Технический статус 2026-11-09:** полный GitHub Actions Release Gate на commit `add8210` прошёл: PostgreSQL 16 migrations/RLS, backend QA, committed frontend `npm ci`/audit/build, Compose health, разделение DB ролей и backup/restore drill (SHA-256 обоих архивов, восстановление БД на head `0032_processing_quality_rls` с 44 таблицами, документный sentinel). Это закрывает CI-блокеры. Общая production readiness остаётся NO-GO до browser E2E, независимого security review, функциональной и юридической приёмки; production deployment не выполнялся.
+> **Технический статус 2026-11-09:** полный GitHub Actions Release Gate на commit `d736f94` (run 42593724186) прошёл: PostgreSQL 16 migrations/RLS, backend QA, committed frontend `npm ci`/audit/build, Compose health, разделение DB ролей и backup/restore drill (SHA-256 обоих архивов, восстановление БД на head `0032_processing_quality_rls` с 44 таблицами, документный sentinel). Это закрывает CI-блокеры. Общая production readiness остаётся NO-GO до browser E2E, независимого security review, функциональной и юридической приёмки; production deployment не выполнялся.
 
 ## Назначение
 
@@ -158,3 +158,7 @@ API `POST /api/v1/transport/estimate` сравнивает введённые т
 После обновления кода примените миграции штатной командой Alembic из раздела обновления. Миграция `0024_shipment_delivery_costs` добавляет к отгрузке необязательную ссылку на расчёт доставки, плановую и фактическую стоимость. Перед применением на рабочей базе обязательны резервная копия и проверка миграции на отдельной копии PostgreSQL. Для записи факта используется `POST /api/v1/warehouse/shipments/{shipment_id}/actual-delivery-cost`; права: директор, логистика, бухгалтерия.
 
 **Важно:** выпуск 0.7 не является production-ready. До пилота остаются обязательными PostgreSQL/RLS интеграционные тесты, проверка миграции на PostgreSQL, сборка frontend и переход с localStorage на защищённую cookie/session схему с CSRF-защитой.
+
+## Актуальное состояние — 2026-11-09, commit d736f94db43a6120f557f3125a90fea408ecebf7
+
+GitHub Actions Release Gate run [42593724186](https://github.com/Matrosov142/-CRM/actions/runs/42593724186) завершился успешно: PostgreSQL 16 migration/RLS/backend QA, frontend committed lockfile/npm ci/audit/build, lockfile assertion и Docker Compose health/roles/backup/restore. Ранее приведённые локальные ограничения и промежуточные падения ниже являются историей, а не текущим состоянием этих ворот. Открытыми остаются browser E2E, независимый security review, функциональная и юридическая/hosting приёмка. PR #1 не слит; production deployment не выполнялся.
