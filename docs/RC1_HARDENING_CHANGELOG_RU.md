@@ -105,3 +105,11 @@
 - Исправлена избыточная проверка RLS-матрицы: таблица `memberships` требует включённый RLS и политики, но не `FORCE`, поскольку привилегированная SECURITY DEFINER проверка директора должна обходить RLS этой таблицы. Остальные tenant-таблицы по-прежнему требуют `ENABLE` и `FORCE`.
 - Frontend gate остановился до `npm ci`: в репозитории отсутствует committed `frontend/package-lock.json`. Production build и зависимый Docker smoke/backup-restore drill этим прогоном не запускались.
 - Исправление матрицы отправлено в PR; результат следующего GitHub Actions прогона ещё ожидается. Никакие пропущенные проверки не считаются успешными.
+
+## Обновление по GitHub Actions commit 2035a78
+
+- PostgreSQL 16 backend job: PASS, включая Alembic upgrade дважды, release QA, RLS matrix и Python dependency audit.
+- Временно созданный npm lockfile candidate успешно прошёл `npm ci`, `npm audit --audit-level=high` и `npm run build` после обновления Vite до 6.4.5 (fix указан самим npm audit для уязвимой версии Vite/esbuild).
+- Проверка committed `frontend/package-lock.json` ожидаемо FAIL: candidate существует только как CI artifact, в ветку он ещё не добавлен.
+- Docker-образы собираются с candidate lockfile, но `db-migrate` завершился с exit 1; health, role-separation и backup/restore drill пока не запускались. В следующий Docker smoke добавлен вывод статуса и логов Compose при ошибке запуска.
+- Релиз остаётся **NO-GO** до committed lockfile, диагностики/исправления db-migrate и успешного повторного полного smoke/restore.

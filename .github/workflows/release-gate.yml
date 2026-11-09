@@ -172,7 +172,12 @@ jobs:
             'ci-runtime-password-not-for-production' \
             'ci-only-jwt-secret-not-for-production-000000000000' > .env.pilot
       - name: Build and start full pilot stack
-        run: docker compose --env-file .env.pilot -f compose.pilot.yml up -d --build
+        run: |
+          if ! docker compose --env-file .env.pilot -f compose.pilot.yml up -d --build; then
+            docker compose --env-file .env.pilot -f compose.pilot.yml ps -a || true
+            docker compose --env-file .env.pilot -f compose.pilot.yml logs --no-color || true
+            exit 1
+          fi
       - name: Remove completed secret-bearing bootstrap and migration containers
         run: docker compose --env-file .env.pilot -f compose.pilot.yml rm -f db-bootstrap db-migrate
       - name: Verify API and web health through reverse proxy
