@@ -479,27 +479,28 @@ def create_procurement_drafts_from_rfq(
         ).first()
         if supplier is None:
             raise HTTPException(status_code=409, detail="Поставщик из выбранного предложения не найден")
+        total = sum((
+            (Decimal(str(rfq_line.quantity)) * Decimal(str(offer_line.unit_price))).quantize(Decimal("0.01"))
+            for rfq_line, offer_line in items
+        ), Decimal("0.00")).quantize(Decimal("0.01"))
         order = ProcurementOrder(
             company_id=actor.company_id,
             order_number=f"RFQ-{rfq.rfq_number}-{str(supplier_id)[:8]}",
             supplier_name=supplier.name, supplier_inn=supplier.inn,
             source_rfq_id=rfq.id, source_supplier_id=supplier.id,
-            currency="RUB", total_amount=Decimal("0.00"), status="draft",
+            currency="RUB", total_amount=total, status="draft",
             created_by_membership_id=actor.id,
         )
         db.add(order); db.flush()
-        total = Decimal("0.00")
         for number, (rfq_line, offer_line) in enumerate(items, 1):
             qty = Decimal(str(rfq_line.quantity))
             price = Decimal(str(offer_line.unit_price))
             line_total = (qty * price).quantize(Decimal("0.01"))
-            total += line_total
             db.add(ProcurementOrderLine(
                 company_id=actor.company_id, procurement_order_id=order.id, line_number=number,
                 item_name=rfq_line.item_name, quantity=qty, unit=rfq_line.unit,
                 unit_price=price, line_total=line_total,
             ))
-        order.total_amount = total.quantize(Decimal("0.01"))
         created.append({"id": str(order.id), "order_number": order.order_number,
                         "supplier_name": order.supplier_name, "total_amount": str(order.total_amount),
                         "line_count": len(items), "status": "draft"})

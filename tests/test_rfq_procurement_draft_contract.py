@@ -19,6 +19,15 @@ def test_generated_orders_are_drafts_and_not_sent():
     assert 'не согласованы и не отправлены поставщикам' in source
 
 
+def test_rfq_order_total_is_computed_before_insert_flush():
+    source = (ROOT / "app/routers/suppliers.py").read_text()
+    route = source[source.index('def create_procurement_drafts_from_rfq'):source.index('@rfq_router.post("/{rfq_id}/selections")')]
+    assert 'total = sum((' in route
+    assert 'currency="RUB", total_amount=total, status="draft"' in route
+    assert route.index('total = sum((') < route.index('db.add(order); db.flush()')
+    assert 'total_amount=Decimal("0.00")' not in route
+
+
 def test_order_source_link_is_tenant_scoped_and_idempotent():
     model = (ROOT / "app/models.py").read_text()
     migration = (ROOT / "migrations/versions/0013_procurement_from_rfq.py").read_text()
