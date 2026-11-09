@@ -50,3 +50,14 @@ def test_migration_adds_composite_fk_and_pair_constraint_with_rls_inherited():
     assert "ck_rfq_line_tender_link_pair" in migration
     # Existing supplier_rfq_lines RLS remains enabled; this migration must not weaken it.
     assert "DISABLE ROW LEVEL SECURITY" not in migration
+
+
+def test_composite_position_target_exists_before_pricing_foreign_key():
+    positions = (ROOT / "migrations/versions/0029_tender_positions.py").read_text()
+    pricing = (ROOT / "migrations/versions/0030_tender_pricing_versions.py").read_text()
+    link = (ROOT / "migrations/versions/0031_rfq_tender_position_link.py").read_text()
+    assert 'UniqueConstraint("company_id", "tender_id", "id", name="uq_tender_position_company_tender_id")' in positions
+    assert "ALTER TABLE public.tender_positions" in pricing
+    assert "uq_tender_position_company_tender_id" in pricing
+    assert pricing.index("uq_tender_position_company_tender_id") < pricing.index("op.create_table")
+    assert "op.create_unique_constraint" not in link

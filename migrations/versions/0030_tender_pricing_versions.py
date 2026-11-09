@@ -9,6 +9,24 @@ branch_labels = None
 depends_on = None
 
 def upgrade():
+    # Ensure the composite target exists on databases that already recorded 0029
+    # before the constraint was added to that migration for fresh installs.
+    op.execute("""
+        DO $$
+        BEGIN
+          IF NOT EXISTS (
+            SELECT 1 FROM pg_constraint
+            WHERE conrelid = 'public.tender_positions'::regclass
+              AND conname = 'uq_tender_position_company_tender_id'
+              AND contype = 'u'
+          ) THEN
+            ALTER TABLE public.tender_positions
+              ADD CONSTRAINT uq_tender_position_company_tender_id
+              UNIQUE (company_id, tender_id, id);
+          END IF;
+        END
+        $$
+    """)
     op.create_table("tender_position_pricing_versions",
         sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
         sa.Column("company_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("companies.id", ondelete="CASCADE"), nullable=False),

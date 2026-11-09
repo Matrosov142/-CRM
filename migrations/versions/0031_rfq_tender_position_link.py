@@ -10,11 +10,6 @@ depends_on = None
 
 
 def upgrade():
-    # PostgreSQL requires a unique key matching the full composite FK target.
-    op.create_unique_constraint(
-        "uq_tender_position_company_tender_id", "tender_positions",
-        ["company_id", "tender_id", "id"],
-    )
     op.add_column("supplier_rfq_lines", sa.Column("tender_id", postgresql.UUID(as_uuid=True), nullable=True))
     op.add_column("supplier_rfq_lines", sa.Column("tender_position_id", postgresql.UUID(as_uuid=True), nullable=True))
     op.create_check_constraint(
@@ -35,4 +30,3 @@ def downgrade():
     op.drop_constraint("ck_rfq_line_tender_link_pair", "supplier_rfq_lines", type_="check")
     op.drop_column("supplier_rfq_lines", "tender_position_id")
     op.drop_column("supplier_rfq_lines", "tender_id")
-    op.drop_constraint("uq_tender_position_company_tender_id", "tender_positions", type_="unique")

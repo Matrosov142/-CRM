@@ -23,6 +23,7 @@ def upgrade():
         sa.Column("notes", sa.String(1000), nullable=False, server_default=""),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
         sa.UniqueConstraint("company_id", "id", name="uq_tender_position_company_id_id"),
+        sa.UniqueConstraint("company_id", "tender_id", "id", name="uq_tender_position_company_tender_id"),
         sa.UniqueConstraint("company_id", "tender_id", "line_number", name="uq_tender_position_line"),
         sa.ForeignKeyConstraint(["company_id", "tender_id"], ["tenders.company_id", "tenders.id"], ondelete="CASCADE", name="fk_tender_position_same_company"),
         sa.CheckConstraint("quantity > 0", name="ck_tender_position_quantity_positive"),
