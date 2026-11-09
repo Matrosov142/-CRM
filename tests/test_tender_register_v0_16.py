@@ -37,7 +37,7 @@ def test_tender_update_allows_partial_changes():
 
 def test_tender_migration_enforces_tenant_rls_and_same_company_memberships():
     migration = (ROOT / "migrations/versions/0028_tender_register.py").read_text()
-    assert 'down_revision = "0027_auth_session_device_metadata"' in migration
+    assert 'down_revision = "0027_auth_session_device"' in migration
     assert "ENABLE ROW LEVEL SECURITY" in migration and "FORCE ROW LEVEL SECURITY" in migration
     assert "app.tenant_id" in migration
     assert 'memberships.company_id", "memberships.id' in migration

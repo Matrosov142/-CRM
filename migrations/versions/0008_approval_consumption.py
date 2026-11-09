@@ -4,7 +4,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 revision = "0008_approval_consumption"
-down_revision = "0007_permissions_limits_approvals"
+down_revision = "0007_permissions_limits"
 branch_labels = None
 depends_on = None
 

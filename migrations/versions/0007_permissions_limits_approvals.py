@@ -3,8 +3,8 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
-revision = "0007_permissions_limits_approvals"
-down_revision = "0006_director_membership_management"
+revision = "0007_permissions_limits"
+down_revision = "0006_director_membership"
 branch_labels = None
 depends_on = None
 

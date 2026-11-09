@@ -1,7 +1,7 @@
 """Allow company directors to manage memberships within their tenant."""
 from alembic import op
 
-revision = "0006_director_membership_management"
+revision = "0006_director_membership"
 down_revision = "0005_employee_invitations"
 branch_labels = None
 depends_on = None

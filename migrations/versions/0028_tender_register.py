@@ -4,7 +4,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 revision = "0028_tender_register"
-down_revision = "0027_auth_session_device_metadata"
+down_revision = "0027_auth_session_device"
 branch_labels = None
 depends_on = None
 

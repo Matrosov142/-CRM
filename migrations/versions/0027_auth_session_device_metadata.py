@@ -2,7 +2,7 @@
 from alembic import op
 import sqlalchemy as sa
 
-revision = "0027_auth_session_device_metadata"
+revision = "0027_auth_session_device"
 down_revision = "0026_login_failure_throttle"
 branch_labels = None
 depends_on = None
