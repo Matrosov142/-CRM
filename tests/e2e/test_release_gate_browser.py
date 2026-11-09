@@ -35,7 +35,15 @@ def register(page, company, email):
     page.get_by_label("Электронная почта").fill(email)
     page.get_by_label("Пароль").fill(PASSWORD)
     page.locator("form button.primary").click()
-    page.get_by_role("heading", name="Панель директора").wait_for(timeout=15000)
+    try:
+        page.get_by_role("heading", name="Панель директора").wait_for(timeout=15000)
+    except Exception as exc:
+        raise AssertionError(f"Browser registration did not establish a session. UI={page.locator('body').inner_text()} cookies={owner_cookies(page)}") from exc
+
+
+def owner_cookies(page):
+    return [{k:c[k] for k in ("name", "httpOnly", "secure", "sameSite")}
+            for c in page.context.cookies()]
 
 
 def test_browser_release_gate_business_and_security():
@@ -69,9 +77,13 @@ def test_browser_release_gate_business_and_security():
         page.get_by_label("Заказчик").fill("Тестовый заказчик")
         page.get_by_label("Начальная цена, ₽").fill("100000")
         page.get_by_label("Срок подачи заявки").fill("2030-01-01T12:00")
-        page.get_by_label("Предмет закупки").fill("Тестовая поставка оборудования")
+        xss_payload = 'Тестовая поставка <img src=x onerror="window.e2eXss=1">'
+        page.get_by_label("Предмет закупки").fill(xss_payload)
         page.get_by_role("button", name="Сохранить тендер").click()
         page.get_by_text(tender_number, exact=False).wait_for(timeout=10000)
+        page.get_by_text(xss_payload, exact=True).wait_for(timeout=10000)
+        assert page.locator('img[onerror="window.e2eXss=1"]').count() == 0
+        assert page.evaluate("window.e2eXss") is None
         page.get_by_role("button", name="Открыть позиции").click()
         page.get_by_label("Наименование", exact=True).fill("Тестовый насос")
         page.get_by_label("Количество", exact=True).fill("10")
@@ -104,6 +116,13 @@ def test_browser_release_gate_business_and_security():
         expect(api(page, f"/api/v1/procurement/orders/{draft['id']}/authorize", "POST", {"approval_request_id":None}))
         order = expect(api(page, f"/api/v1/procurement/orders/{draft['id']}"))
         line = order["lines"][0]
+        members = expect(api(page, "/api/v1/employees"))
+        director = next(m for m in members if m["role"] == "director")
+        expect(api(page, f"/api/v1/procurement/orders/{draft['id']}/authorize", "POST", {"approval_request_id":None}), 409)
+        expect(api(page, f"/api/v1/access/employees/{director['id']}/limits", "PUT", {
+            "operation":"purchase","limit_amount":"2000.00"
+        }))
+        expect(api(page, f"/api/v1/procurement/orders/{draft['id']}/authorize", "POST", {"approval_request_id":None}))
         expect(api(page, "/api/v1/warehouse/receipts", "POST", {
             "receipt_number":f"REC-{suffix}-1","procurement_order_id":draft["id"],"location":"A-01",
             "lines":[{"procurement_order_line_id":line["id"],"received_quantity":"6","accepted_quantity":"5","defective_quantity":"1","defect_note":"Брак тестовой единицы"}]

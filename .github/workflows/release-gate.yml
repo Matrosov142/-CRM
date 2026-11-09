@@ -189,6 +189,9 @@ jobs:
           POTOK_E2E_BASE_URL: http://127.0.0.1:18080
           POTOK_E2E_UNTRUSTED_URL: http://127.0.0.1:18081
         run: python -m pytest -q tests/e2e/test_release_gate_browser.py
+      - name: Show disposable E2E service logs on failure
+        if: failure()
+        run: docker compose --env-file .env.e2e -f compose.pilot.yml -f .github/compose.e2e.yml logs --no-color
       - name: Tear down disposable E2E database and files
         if: always()
         run: |
