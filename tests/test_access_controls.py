@@ -28,3 +28,10 @@ def test_permission_dependency_uses_persisted_override():
     assert "EmployeePermissionOverride" in source
     assert "EmployeePermissionOverride.allowed" not in source  # row value is read per membership
     assert "effective_permission(membership.role, action, override)" in source
+
+
+def test_operation_limit_audit_serializes_decimal_as_exact_json_string():
+    from pathlib import Path
+    source = (Path(__file__).resolve().parents[1] / "app/routers/access.py").read_text(encoding="utf-8")
+    assert '"limit_amount": str(payload.limit_amount)' in source
+    assert '"amount": str(payload.amount)' in source

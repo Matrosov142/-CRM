@@ -144,7 +144,7 @@ def set_employee_limit(
         db, company_id=actor.company_id, actor_user_id=actor.user_id,
         action="employee.operation_limit_changed", entity_type="membership",
         entity_id=str(target.id),
-        details={"operation": payload.operation, "limit_amount": payload.limit_amount},
+        details={"operation": payload.operation, "limit_amount": str(payload.limit_amount)},
     )
     db.commit()
     return {"updated": True, "operation": payload.operation, "limit_amount": payload.limit_amount}
@@ -211,7 +211,7 @@ def create_approval_request(
         db, company_id=actor.company_id, actor_user_id=actor.user_id,
         action="approval.requested", entity_type="approval_request",
         entity_id=str(request.id),
-        details={"operation": payload.operation, "amount": payload.amount},
+        details={"operation": payload.operation, "amount": str(payload.amount)},
     )
     db.commit()
     return {"id": str(request.id), "status": "pending", "message": "Запрос направлен директору"}
