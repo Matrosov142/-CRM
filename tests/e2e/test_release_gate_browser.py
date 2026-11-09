@@ -134,7 +134,9 @@ def test_browser_release_gate_business_and_security():
             "receipt_number":f"REC-{suffix}-2","procurement_order_id":draft["id"],"location":"A-01",
             "lines":[{"procurement_order_line_id":line["id"],"received_quantity":"4","accepted_quantity":"4","defective_quantity":"0"}]
         }), 201)
-        batch = next(x for x in expect(api(page, "/api/v1/warehouse/batches")) if x["item_name"] == "Тестовый насос")
+        batches = [x for x in expect(api(page, "/api/v1/warehouse/batches")) if x["item_name"] == "Тестовый насос"]
+        assert sorted(Decimal(x["quantity_balance"]) for x in batches) == [Decimal("4.000"), Decimal("5.000")]
+        batches.sort(key=lambda x: Decimal(x["quantity_balance"]), reverse=True)
 
         # Delivery estimate, partial reservation/shipment and actual transport cost.
         estimate = expect(api(page, "/api/v1/transport/estimate", "POST", {
@@ -143,18 +145,23 @@ def test_browser_release_gate_business_and_security():
         }))
         expect(api(page, f"/api/v1/transport/estimates/{estimate['id']}/select?option_index=0", "POST", {}))
         reservation = expect(api(page, "/api/v1/warehouse/reservations", "POST", {
-            "reference":f"RES-{suffix}","reason":"E2E частичная отгрузка","lines":[{"stock_batch_id":batch["id"],"quantity":"7"}]
+            "reference":f"RES-{suffix}","reason":"E2E частичная отгрузка","lines":[
+                {"stock_batch_id":batches[0]["id"],"quantity":"5"},
+                {"stock_batch_id":batches[1]["id"],"quantity":"2"},
+            ]
         }), 201)
         active_reservations = expect(api(page, "/api/v1/warehouse/reservations?status=active"))
         reservation_row = next(r for r in active_reservations if r["id"] == reservation["id"])
-        reservation_line = reservation_row["lines"][0]
+        reservation_line = next(line for line in reservation_row["lines"] if Decimal(line["quantity"]) >= 3)
         shipment = expect(api(page, "/api/v1/warehouse/shipments", "POST", {
             "shipment_number":f"SHIP-{suffix}","reservation_id":reservation["id"],"carrier":"Тест Перевозчик","destination":"Адрес тест",
             "delivery_estimate_id":estimate["id"],"lines":[{"reservation_line_id":reservation_line["id"],"quantity":"3"}]
         }), 201)
         assert Decimal(shipment["shipped_quantity"]) == 3
-        stock = next(x for x in expect(api(page, "/api/v1/warehouse/availability")) if x["batch_id"] == batch["id"])
-        assert (Decimal(stock["physical_quantity"]), Decimal(stock["reserved_quantity"]), Decimal(stock["available_quantity"])) == (6, 4, 2)
+        stock = [x for x in expect(api(page, "/api/v1/warehouse/availability")) if x["batch_id"] in {b["id"] for b in batches}]
+        assert (sum((Decimal(x["physical_quantity"]) for x in stock), Decimal("0")),
+                sum((Decimal(x["reserved_quantity"]) for x in stock), Decimal("0")),
+                sum((Decimal(x["available_quantity"]) for x in stock), Decimal("0"))) == (6, 4, 2)
         actual = expect(api(page, f"/api/v1/warehouse/shipments/{shipment['id']}/actual-delivery-cost", "POST", {"actual_cost":"275","note":"E2E"}))
         assert Decimal(actual["variance"]) == 25
 
