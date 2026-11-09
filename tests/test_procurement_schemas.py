@@ -30,3 +30,9 @@ def test_supplier_inn_rejects_invalid_length_or_letters():
 def test_order_requires_at_least_one_line():
     with pytest.raises(ValidationError):
         ProcurementOrderCreate(order_number="PO-002", supplier_name="Поставщик", lines=[])
+
+
+def test_order_detail_exposes_line_ids_needed_for_warehouse_receipts():
+    from pathlib import Path
+    source = (Path(__file__).resolve().parents[1] / "app/routers/procurement.py").read_text(encoding="utf-8")
+    assert '"id": str(line.id)' in source

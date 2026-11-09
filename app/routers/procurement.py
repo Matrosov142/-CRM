@@ -30,6 +30,7 @@ def _order_payload(order, lines):
         "created_at": order.created_at.isoformat(),
         "authorized_at": order.authorized_at.isoformat() if order.authorized_at else None,
         "lines": [{
+            "id": str(line.id),
             "line_number": line.line_number,
             "item_name": line.item_name,
             "quantity": str(line.quantity),
