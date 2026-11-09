@@ -52,6 +52,19 @@ def test_tender_api_scopes_every_lookup_to_current_company_and_audits_changes():
     assert "require_roles(*WRITE_ROLES)" in router
 
 
+def test_tender_router_restores_transaction_local_rls_context_before_refresh():
+    router = (ROOT / "app/routers/tenders.py").read_text()
+    assert "from app.tenant_context import set_tenant_context" in router
+    # PostgreSQL SET LOCAL values are cleared by commit; every refresh must be
+    # preceded by restoring the actor's tenant context in the new transaction.
+    lines = router.splitlines()
+    refresh_lines = [i for i, line in enumerate(lines) if "db.refresh(" in line]
+    assert len(refresh_lines) == 5
+    for index in refresh_lines:
+        assert any("set_tenant_context(db, actor.user_id, actor.company_id)" in line
+                   for line in lines[max(0, index - 3):index + 1])
+
+
 def test_tender_router_is_registered_and_version_bumped():
     main = (ROOT / "app/main.py").read_text()
     assert "app.include_router(tenders.router)" in main

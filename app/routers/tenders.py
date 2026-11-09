@@ -8,6 +8,7 @@ from app.database import get_db
 from app.models import Tender, TenderPosition, TenderPositionPricingVersion, Membership
 from app.permissions import Role, require_roles
 from app.schemas import TenderCreateRequest, TenderUpdateRequest, TenderPositionCreateRequest, TenderPositionUpdateRequest, TenderPositionPricingRequest
+from app.tenant_context import set_tenant_context
 
 router = APIRouter(prefix="/api/v1/tenders", tags=["Тендеры"])
 READ_ROLES = (Role.DIRECTOR, Role.TENDER_SPECIALIST, Role.PROCUREMENT_MANAGER, Role.ACCOUNTING)
@@ -53,6 +54,9 @@ def create_tender(payload: TenderCreateRequest,
     except IntegrityError:
         db.rollback()
         raise HTTPException(status_code=409, detail="Тендер с таким номером на этой площадке уже существует")
+    # RLS context is transaction-local and commit clears it. Restore it before
+    # refreshing the committed row, otherwise PostgreSQL hides the new tender.
+    set_tenant_context(db, actor.user_id, actor.company_id)
     db.refresh(tender)
     return _view(tender)
 
@@ -98,6 +102,7 @@ def update_tender(tender_id: UUID, payload: TenderUpdateRequest,
     except IntegrityError:
         db.rollback()
         raise HTTPException(status_code=409, detail="Не удалось сохранить изменения из-за конфликта данных")
+    set_tenant_context(db, actor.user_id, actor.company_id)
     db.refresh(t)
     return _view(t)
 
@@ -151,7 +156,7 @@ def create_tender_position(tender_id: UUID, payload: TenderPositionCreateRequest
     record_audit(db, company_id=actor.company_id, actor_user_id=actor.user_id,
         action="tender.position.created", entity_type="tender_position", entity_id=str(row.id),
         details={"tender_id": str(tender_id), "line_number": next_line})
-    db.commit(); db.refresh(row)
+    db.commit(); set_tenant_context(db, actor.user_id, actor.company_id); db.refresh(row)
     return _position_view(row)
 
 
@@ -173,7 +178,7 @@ def update_tender_position(tender_id: UUID, position_id: UUID, payload: TenderPo
     record_audit(db, company_id=actor.company_id, actor_user_id=actor.user_id,
         action="tender.position.updated", entity_type="tender_position", entity_id=str(row.id),
         details={"fields": sorted(changes), "tender_id": str(tender_id)})
-    db.commit(); db.refresh(row)
+    db.commit(); set_tenant_context(db, actor.user_id, actor.company_id); db.refresh(row)
     return _position_view(row)
 
 
@@ -261,6 +266,7 @@ def save_tender_position_pricing(tender_id: UUID, position_id: UUID,
     except IntegrityError:
         db.rollback()
         raise HTTPException(status_code=409, detail="Конфликт версии расчёта. Повторите сохранение")
+    set_tenant_context(db, actor.user_id, actor.company_id)
     db.refresh(version)
     return {"id": str(version.id), "version": version.version, "inputs": version.inputs,
         "result": version.result, "created_by_membership_id": str(version.created_by_membership_id),
