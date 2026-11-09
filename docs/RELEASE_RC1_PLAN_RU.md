@@ -1,24 +1,24 @@
 # ПОТОК CRM — план допуска к Release Candidate 1
 
 **Текущая базовая версия:** `0.25.0-pilot`  
-**Статус:** полный GitHub Actions Release Gate `PASS` на commit `d736f94` (run 42593724186); общий допуск RC1/production остаётся `NO-GO` до закрытия остальных приёмочных ворот.
+**Статус:** полный GitHub Actions Release Gate `PASS` на source commit `376066927eb96aa037a18a1bc5f66dd0e41b7b4f` (run 42605391256); CI run 42605391146 также `PASS`. Общий допуск к пилоту с рабочими данными остаётся `NO-GO` до независимой security review, формальной бизнес-приёмки и legal/hosting review.
 **Правило:** ни один пункт не закрывается по наличию кода или статическому анализу. Нужен воспроизводимый лог успешной проверки.
 
 ## 1. Контрольные ворота RC1
 
 | Ворота | Что считается доказательством | Текущий статус |
 |---|---|---|
-| Backend regression | Полный QA runner, все тесты, включая PostgreSQL suite | PASS в GitHub Actions run 42593724186 (`d736f94`) |
+| Backend regression | Полный QA runner, все тесты, включая PostgreSQL suite | PASS в GitHub Actions run 42605391256: 58 test files, PostgreSQL included |
 | PostgreSQL migrations | Чистая PostgreSQL 16 DB: `alembic upgrade head`; повторный запуск без ошибок | PASS: upgrade выполнен дважды |
 | Least privilege | `potok_runtime` не владелец, не SUPERUSER, без BYPASSRLS; права проверены SQL | PASS в Compose smoke |
 | Tenant isolation | Положительные и отрицательные cross-tenant тесты по tenant-owned сущностям | RLS matrix и PostgreSQL integration прошли в CI |
 | Frontend | Зафиксированный `package-lock.json`, `npm ci`, `npm run build` | PASS: lockfile закоммичен, npm ci, audit и build прошли |
 | Docker | Успешные сборки API и web образов, запуск с PostgreSQL, healthchecks | PASS: Compose smoke, API/web loopback health прошли |
-| Browser E2E | Регистрация/вход/выход, CSRF/Origin, роли, критические бизнес-потоки | Не проверено |
-| Backup/restore | Восстановление БД и файлов из резервной копии в чистую среду | PASS: SHA-256, head `0032_processing_quality_rls`, 44 таблицы, документный sentinel |
-| Security | Проверка секретов, CORS, cookies, загрузок/скачиваний, tenant boundaries; независимый pentest | Не проверено |
+| Browser E2E | Регистрация/вход/выход, CSRF/Origin, роли, критические бизнес-потоки | PASS в run 42605391256: real Chromium через disposable Compose/nginx |
+| Backup/restore | Восстановление БД и файлов из резервной копии в чистую среду | PASS: SHA-256, head `0033_company_registration_rls`, 44 таблицы, документный sentinel |
+| Security | Автоматизированные и браузерные проверки пройдены; независимый pentest/review | Технические проверки PASS; независимая оценка pending |
 | Legal / hosting | Юридическая проверка 152-ФЗ, локализации, договоров и выбранного российского хостинга | Не проверено |
-| Functional acceptance | Подписанные сценарии тендеров, закупок, склада, логистики, финансов и документов | Не проверено |
+| Functional acceptance | Синтетический E2E поток тендер→закупка→склад→доставка→финансы/документы; формальная подпись владельца процесса | Автотест PASS; внешняя бизнес-подпись pending |
 
 ## 2. Автоматизация
 
@@ -35,12 +35,12 @@ Workflow намеренно не пропускает frontend gate при от�
 
 ## 3. Очерёдность закрытия блокеров
 
-1. Сгенерировать и закоммитить `frontend/package-lock.json` командой `npm install --package-lock-only` в среде с доступом к npm registry; затем проверить `npm ci && npm run build`.
-2. Запустить release workflow и исправить все ошибки PostgreSQL migrations/RLS, не ослабляя политики ради зелёного теста.
-3. Расширить RLS matrix на документы, вложения, тендеры, закупки, складские партии/резервы/отгрузки, финансы, согласования и транспортные расходы. Для каждого домена нужны тесты чтения, создания, изменения и доступа по чужому ID.
-4. Запустить Docker Compose на чистом Linux-хосте, проверить healthchecks, перезапуск, volumes, логи и shutdown.
-5. Добавить браузерные E2E сценарии и проверить cookie/CSRF/Origin поведение через реальный reverse proxy с TLS.
-6. Выполнить backup/restore drill: БД плюс файловое хранилище; зафиксировать время восстановления и контроль целостности.
+1. Выполнено: committed lockfile v3; `npm ci`, `npm audit --audit-level=high` (0 уязвимостей) и production build прошли в Release Gate.
+2. Выполнено: PostgreSQL 16 миграции применены дважды; RLS matrix/backend QA и dependency audit прошли в run 42605391256.
+3. Выполнено: CI PostgreSQL RLS matrix проверяет все tenant-owned таблицы; Browser E2E дополнительно проверил cross-company изоляцию тендера. Для полного security sign-off всё ещё нужна независимая оценка.
+4. Compose build/start, API/web health, DB roles и backup/restore drill прошли в GitHub Actions. Полный пилотный хост с мониторингом/восстановлением ещё требует инфраструктурного испытания.
+5. Выполнено для disposable Compose/nginx без TLS: Browser E2E PASS. Настоящий production-like TLS/reverse proxy сценарий ещё не проверен.
+6. Выполнено в disposable CI: checksum БД/файлов, DB restore на revision 0033 (44 таблицы), document sentinel PASS. Время RTO/RPO для целевой инфраструктуры не измерено.
 7. Провести функциональную приёмку по реальным пользовательским сценариям и юридическую проверку до подключения клиентских данных.
 
 ## 4. Запреты
@@ -185,14 +185,25 @@ Temporary npm candidate artifact: `13660698809`. Он подтверждает �
 
 CI Release Gate: **PASS**. Общий статус допуска RC1/production: **NO-GO** до browser E2E, независимого security review, функциональной и юридической/hosting приёмки. PR остаётся открытым и не слит в `main`.
 
-## Актуальное состояние — 2026-11-09, commit d736f94db43a6120f557f3125a90fea408ecebf7
+## Исторический статус на commit d736f94 (до E2E)
 
 GitHub Actions Release Gate run [42593724186](https://github.com/Matrosov142/-CRM/actions/runs/42593724186) завершился успешно: PostgreSQL 16 migration/RLS/backend QA, frontend committed lockfile/npm ci/audit/build, lockfile assertion и Docker Compose health/roles/backup/restore. Ранее приведённые локальные ограничения и промежуточные падения ниже являются историей, а не текущим состоянием этих ворот. Открытыми остаются browser E2E, независимый security review, функциональная и юридическая/hosting приёмка. PR #1 не слит; production deployment не выполнялся.
 
-## Текущий статус проверки — 2026-11-09
+## Исторический статус проверки до полного Browser E2E
 
-Текущий commit `5c200aebed06d2742263e13d65f42d6182d92ab4` содержит исправления после последнего завершённого прогона и ожидает собственного GitHub Actions результата. Последний завершённый Release Gate: [run 42600832811](https://github.com/Matrosov142/-CRM/actions/runs/42600832811), проверял `e4fa14870e97b2dc66bc93e0cf22551527430ff6`: backend/PostgreSQL 16/RLS, frontend lockfile/npm ci/audit/build и Docker/Compose/backup/restore прошли; Browser E2E упал при преобразовании выбранной строки RFQ в закупку. Лог показал, что код сначала вставлял закупку с `total_amount=0`, нарушая PostgreSQL constraint; исправление расчёта до вставки уже отправлено в текущий commit, но ещё не подтверждено прогоном.
+На той промежуточной точке source commit `5c200aebed06d2742263e13d65f42d6182d92ab4` ожидал проверки; run 42600832811 подтвердил ошибку нулевой суммы закупки. Исправление было внесено после этого снимка. Последующая итоговая проверка приведена ниже.
 
-Промежуточный Chromium прогон подтвердил регистрацию через интерфейс, cookie-сессию, защитные заголовки nginx, создание тендера и позиции, сохранение безопасного текста XSS-payload, CSRF отказ, запрос поставщику и выбор предложения. Сквозной E2E полного потока пока НЕ пройден. В ответ RFQ добавлен идентификатор строки, без которого API предложения/выбора не мог быть вызван корректно. Не считать это исправление проверенным до следующего workflow.
+Промежуточный Chromium прогон подтверждал только начальные этапы. Полный сквозной E2E ещё не был пройден на этом историческом снимке.
 
-Статус остаётся **NO-GO**: Browser E2E не завершён; независимый penetration/security review, бизнес-приёмка и юридическая/hosting-проверка не выполнялись. `production_ready=false`; PR #1 открыт, не слит; production deployment не выполнялся.
+Статус на промежуточном снимке был **NO-GO**; ниже приведён новый подтверждённый Release Gate. `production_ready=false`; PR #1 открыт, не слит; production deployment не выполнялся.
+
+
+## Актуальный результат — 2026-11-09
+
+Release Gate [42605391256](https://github.com/Matrosov142/-CRM/actions/runs/42605391256) прошёл все пять заданий на source commit `376066927eb96aa037a18a1bc5f66dd0e41b7b4f`; CI run [42605391146](https://github.com/Matrosov142/-CRM/actions/runs/42605391146) тоже успешен. Подтверждены backend/PostgreSQL 16/RLS, 58 выбранных тестовых файлов, compileall 146 Python-файлов, статический аудит, npm ci/audit/build, real Chromium E2E и Docker Compose/backup/restore. Восстановленная БД: `0033_company_registration_rls`, 44 таблицы; файловый sentinel восстановлен.
+
+Browser E2E прошёл синтетический поток: регистрация и cookie-сессия, CSRF/Origin, роли и tenant isolation; тендер/позиция, RFQ/offer и согласование закупки, две частичные приёмки с браком, резерв из нескольких партий, частичная отгрузка, план/факт доставки и variance, подтверждение платежа, загрузка/скачивание PDF. Денежные суммы и остатки проверены decimal assertions. Это автоматизированная техническая приёмка; формальное одобрение владельца бизнеса не получено.
+
+Подтверждённые дефекты исправлены отдельными коммитами: восстановление transaction-local RLS контекста после commit перед ORM refresh; возврат ID строк RFQ и закупки; вычисление суммы закупки до вставки под положительным DB constraint; разделение employee id и membership id; безопасная строковая сериализация Decimal в JSONB audit details. Регрессионные проверки добавлены.
+
+Независимый pentest/security sign-off, тест на реальной TLS инфраструктуре, юридическая оценка 152-ФЗ/локализации и формальная бизнес-приёмка остаются внешними/отдельными воротами. Статус допуска с реальными данными **NO-GO**, `production_ready=false`; PR #1 остаётся открытым и неслитым.

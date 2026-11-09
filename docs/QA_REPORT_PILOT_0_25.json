@@ -1,35 +1,32 @@
 {
   "release": "0.25.0-pilot",
-  "generated_at_utc": "2026-11-09T17:36:10+07:00",
-  "python_files": 142,
+  "generated_at_utc": "2026-11-09T18:03:36+07:00",
+  "python_files": 146,
   "compileall": {
-    "passed": true,
-    "output": ""
+    "output": "GitHub Actions CI 42605391146: compileall app/migrations/tests passed (146 Python files).",
+    "passed": true
   },
   "static_audit": {
-    "passed": true,
-    "output": "Python files syntax-checked: 142\nAlembic revisions: 32; roots: 1; branches: 0\nFastAPI version: 0.25.0-pilot\n[ACTION REQUIRED] Dashboard KPIs are hard-coded demo values; they are not live CRM metrics.\nRESULT: PASS — static release audit only; no runtime, database, RLS or security penetration tests performed.\n"
+    "output": "GitHub Actions CI 42605391146 and Release Gate 42605391256: static release audit passed.",
+    "passed": true
   },
   "selected_tests": {
     "passed": true,
-    "files_run": 55,
-    "excluded_due_to_environment": [
-      "test_postgres_rls_integration.py",
-      "test_postgres_rls_matrix.py"
-    ],
-    "output": "........................................................................ [ 33%]\n........................................................................ [ 67%]\n....................................................................     [100%]\n212 passed in 1.46s\n"
+    "files_run": 58,
+    "excluded_due_to_environment": [],
+    "output": "All 58 selected test files passed in Release Gate run 42605391256; PostgreSQL integration included. Browser E2E separately passed in the same run."
   },
   "postgresql_integration": {
-    "status": "passed in GitHub Actions run 42600832811 at e4fa148: PostgreSQL 16 migrations twice, release QA and RLS matrix; 33 Alembic revisions.",
-    "configured": true
+    "configured": true,
+    "status": "passed in Release Gate run 42605391256: PostgreSQL 16, migration upgrade twice, RLS matrix, backend QA, 58 selected test files; migration head 0033_company_registration_rls."
   },
   "frontend": {
     "package_lock_present": true,
     "package_lock_sha256": "96491406B390CDA4336CE8DFBED6920362748AB83FCCDA98815F39FC425B6714",
-    "production_build": "passed with committed lockfile: npm ci, npm audit --audit-level=high, npm run build in run 42600832811.",
+    "production_build": "PASS in run 42605391256: npm ci (70 packages), npm audit --audit-level=high (0 vulnerabilities), npm run build.",
     "package_lock_version": 3
   },
-  "docker_runtime": "passed in GitHub Actions run 42600832811: Compose build/start, API/web health, role separation, backup/restore to 0033_company_registration_rls.",
+  "docker_runtime": "PASS in Release Gate run 42605391256: Compose build/start, API/web health, role separation, backup checksums; PostgreSQL restore head 0033_company_registration_rls (44 tables), document sentinel restore.",
   "production_ready": false,
   "technical_preflight_2026_11_09": {
     "source_archive": "POTOK_CRM_v0.25.2(1).zip; extracted and inspected",
@@ -52,24 +49,27 @@
     "production_ready": false
   },
   "last_completed_github_run": {
-    "frontend": "passed: committed lockfile, npm ci, npm audit high threshold, production build",
-    "committed_frontend_lockfile": "passed",
-    "docker_compose": "passed build/start, API/web health, role separation and backup/restore",
+    "frontend": "passed: committed lockfile npm ci, npm audit --audit-level=high, production build; 70 installed, 0 vulnerabilities",
     "production_ready": false,
-    "release_workflow": "failure: browser E2E RFQ-to-procurement conversion failed; backend, frontend, lockfile and Docker jobs passed",
-    "commit": "e4fa14870e97b2dc66bc93e0cf22551527430ff6",
-    "role_separation": "passed: owner/runtime role flags and API credential boundary",
-    "backend_postgresql_rls": "passed: migrations twice, release QA/RLS matrix, pip-audit",
-    "backup_restore": "passed: SHA-256, database restore to 0033_company_registration_rls, document sentinel",
-    "run_id": 42600832811,
-    "run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42600832811"
+    "backend_postgresql_rls": "passed: migrations twice, release QA/RLS matrix, pip-audit, 58 selected test files",
+    "run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42605391256",
+    "browser_e2e": "passed: registration/session, CSRF/Origin, RBAC, tenant isolation, tender/position, supplier RFQ/offer, procurement approvals, partial receipts, multi-batch reservation/partial shipment, delivery cost, finance, document upload/download",
+    "ci_run_id": 42605391146,
+    "committed_frontend_lockfile": "passed, lockfile v3",
+    "release_workflow": "success: all five jobs passed, including real Chromium browser E2E",
+    "commit": "376066927eb96aa037a18a1bc5f66dd0e41b7b4f",
+    "ci_run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42605391146",
+    "run_id": 42605391256,
+    "role_separation": "passed: potok_owner and potok_runtime flags and API credential boundary",
+    "backup_restore": "passed: SHA-256, database restored to 0033_company_registration_rls (44 tables), document sentinel restored",
+    "docker_compose": "passed: image build/start, API/web health and role separation"
   },
-  "current_branch_changes_pending_ci": {
+  "last_verified_source_commit": "376066927eb96aa037a18a1bc5f66dd0e41b7b4f",
+  "last_verified_release_gate": "PASS: all five Release Gate jobs and CI workflow succeeded for source commit 376066927eb96aa037a18a1bc5f66dd0e41b7b4f; browser E2E passed against disposable Compose pilot stack.",
+  "last_verified_source_state": {
+    "commit": "376066927eb96aa037a18a1bc5f66dd0e41b7b4f",
+    "remaining_release_acceptance": "independent security review, external functional/business sign-off, legal and hosting review",
     "production_ready": false,
-    "remaining_release_acceptance": "browser E2E, independent security review, functional and legal/hosting acceptance",
-    "commit": "5c200aebed06d2742263e13d65f42d6182d92ab4",
-    "status": "current RFQ-to-procurement amount fix not yet validated by Actions; previous run exposed total_amount=0 constraint violation"
-  },
-  "current_branch_sha": "5c200aebed06d2742263e13d65f42d6182d92ab4",
-  "current_branch_release_gate_status": "pending: latest completed run 42600832811 failed Browser E2E before the procurement amount fix in current SHA; no current-SHA run available yet"
+    "status": "none: all Release Gate jobs passed for this source commit"
+  }
 }

@@ -151,16 +151,27 @@
 - Compose smoke проверил API/web через loopback reverse proxy, least-privilege DB роли, SHA-256 backup обоих архивов, PostgreSQL restore на `0032_processing_quality_rls` (44 таблицы) и восстановление файлового sentinel.
 - CI-блокеры закрыты. Production readiness не заявляется: browser E2E, независимый security review, функциональная и юридическая/hosting приёмка остаются отдельными воротами. PR #1 не слит, production deployment не выполнялся.
 
-## Актуальное состояние — 2026-11-09, commit d736f94db43a6120f557f3125a90fea408ecebf7
+## Исторический статус на commit d736f94 (до Browser E2E)
 
 GitHub Actions Release Gate run [42593724186](https://github.com/Matrosov142/-CRM/actions/runs/42593724186) завершился успешно: PostgreSQL 16 migration/RLS/backend QA, frontend committed lockfile/npm ci/audit/build, lockfile assertion и Docker Compose health/roles/backup/restore. Ранее приведённые локальные ограничения и промежуточные падения ниже являются историей, а не текущим состоянием этих ворот. Открытыми остаются browser E2E, независимый security review, функциональная и юридическая/hosting приёмка. PR #1 не слит; production deployment не выполнялся.
 
-## Состояние контрольных ворот — 2026-11-09
+## Исторический промежуточный статус до завершения Browser E2E
 
-- Текущий head `5c200aebed06d2742263e13d65f42d6182d92ab4` ожидает CI. Последний завершённый Release Gate [42600832811](https://github.com/Matrosov142/-CRM/actions/runs/42600832811), head `e4fa14870e97b2dc66bc93e0cf22551527430ff6`: backend/PostgreSQL/RLS, frontend `npm ci`/audit/build, lockfile assertion и Compose/backup/restore прошли; Browser E2E упал при создании procurement draft.
+- В этом промежуточном прогоне Browser E2E упал при создании procurement draft; последующие исправления, E2E и полный Release Gate подтверждены в разделе ниже.
 - Подтверждённая причина: первоначальный `total_amount=0.00` нарушал `ck_procurement_order_amount_positive` во время flush. Сумма теперь считается до INSERT; регрессионный контракт добавлен. Повторное подтверждение E2E ожидается.
 - Браузерным Chromium уже реально проверены регистрация, cookie и security headers, создание тендера/позиции, экранирование XSS-payload, CSRF отказ. RFQ detail теперь включает `id` строки для дальнейшего предложения и выбора.
 - Исправлен дефект Post-commit refresh при transaction-local RLS: tenant context восстанавливается до перечитывания тендера/позиции/калькуляции.
 - Не заявлены успешными: полный браузерный бизнес-поток, независимый security review, функциональная бизнес-приёмка и юридический/hosting review.
 
 **Решение:** остаётся **NO-GO**, `production_ready=false`; PR №1 не слит, deployment не выполнялся.
+
+## Итерация browser E2E и сквозной приёмки — 2026-11-09
+
+- Полный Release Gate run [42605391256](https://github.com/Matrosov142/-CRM/actions/runs/42605391256) прошёл 5/5 jobs на source SHA `376066927eb96aa037a18a1bc5f66dd0e41b7b4f`; CI [42605391146](https://github.com/Matrosov142/-CRM/actions/runs/42605391146) тоже PASS.
+- 58 выбранных backend test files, PostgreSQL 16/RLS, миграции дважды, compileall 146 Python файлов, static audit и pip-audit прошли.
+- npm ci (70 пакетов), npm audit (0 vulnerabilities на high threshold), production build и committed lockfile check прошли.
+- Реальный Chromium в disposable Compose/nginx прошёл регистрацию/сессии, CSRF/Origin, RBAC, cross-company изоляцию, tender/position, supplier RFQ/offer, procurement approval, 2 частичные приёмки (5 принято + 1 брак; затем 4 принято), резерв 7 единиц из двух партий, отгрузку 3, остаток 6 физически / 4 зарезервировано / 2 доступно, delivery variance 25, payment 1000 и PDF upload/download.
+- Compose smoke, разделение DB ролей, SHA-256 backup, restore revision `0033_company_registration_rls` (44 таблицы) и document sentinel прошли.
+- Исправлены подтверждённые интеграционные дефекты: RLS-контекст после commit, missing RFQ/procurement line IDs, промежуточный нулевой total заказа, employee vs membership ID, Decimal в JSONB audit details. Добавлены регрессионные проверки.
+
+Не закрыты: независимый pentest/security sign-off, production TLS/reverse-proxy/hosting drill, формальная бизнес-приёмка и юридическая оценка. Автоматизированный E2E использует только синтетические данные; production deployment не выполнялся. Итоговый статус с реальными данными: **NO-GO**.
