@@ -44,6 +44,7 @@ class AcceptEmployeeInviteRequest(BaseModel):
 
 class EmployeeResponse(BaseModel):
     id: UUID
+    membership_id: UUID
     email: EmailStr
     role: str
     status: str

@@ -18,3 +18,11 @@ def test_staff_api_exposes_director_management_operations():
     assert '@router.patch("/{membership_id}/role")' in source
     assert '@router.post("/{membership_id}/revoke")' in source
     assert 'Нельзя отозвать доступ последнего директора' in source
+
+
+def test_employee_listing_exposes_membership_id_for_membership_scoped_controls():
+    root = Path(__file__).resolve().parents[1]
+    schema = (root / "app/schemas.py").read_text(encoding="utf-8")
+    router = (root / "app/routers/employees.py").read_text(encoding="utf-8")
+    assert "membership_id: UUID" in schema
+    assert "membership_id=member.id" in router

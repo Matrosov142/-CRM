@@ -138,7 +138,8 @@ def list_employees(
         .order_by(User.email)
         .all())
     return [
-        EmployeeResponse(id=user.id, email=user.email, role=member.role, status=member.status)
+        EmployeeResponse(id=user.id, membership_id=member.id, email=user.email,
+                         role=member.role, status=member.status)
         for member, user in rows
     ]
 
