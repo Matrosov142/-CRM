@@ -1,6 +1,6 @@
 {
   "release": "0.25.0-pilot",
-  "generated_at_utc": "2026-11-09T09:08:38+00:00",
+  "generated_at_utc": "2026-11-09T09:28:06+00:00",
   "python_files": 142,
   "compileall": {
     "passed": true,
@@ -20,14 +20,16 @@
     "output": "........................................................................ [ 33%]\n........................................................................ [ 67%]\n....................................................................     [100%]\n212 passed in 1.46s\n"
   },
   "postgresql_integration": {
-    "configured": true,
-    "status": "passed in GitHub Actions commit 212aadf: PostgreSQL 16 Alembic upgrade twice, release QA and RLS matrix"
+    "status": "passed in GitHub Actions add8210: PostgreSQL 16 migration upgrade twice, release QA and RLS matrix",
+    "configured": true
   },
   "frontend": {
-    "package_lock_present": false,
-    "production_build": "passed in GitHub Actions: runner-generated npm lock candidate, npm ci, npm audit --audit-level=high, npm run build; candidate not committed to branch"
+    "package_lock_present": true,
+    "package_lock_sha256": "96491406B390CDA4336CE8DFBED6920362748AB83FCCDA98815F39FC425B6714",
+    "production_build": "passed with committed lockfile: npm ci (70 packages), npm audit --audit-level=high (71 audited), npm run build",
+    "package_lock_version": 3
   },
-  "docker_runtime": "passed in GitHub Actions commit 212aadf: full Compose build/start, DB migrations, API/web host health and least-privilege role checks",
+  "docker_runtime": "passed in GitHub Actions add8210: full Compose build/start, migration, API/web host health and least-privilege role checks",
   "production_ready": false,
   "technical_preflight_2026_11_09": {
     "source_archive": "POTOK_CRM_v0.25.2(1).zip; extracted and inspected",
@@ -50,19 +52,20 @@
     "production_ready": false
   },
   "last_completed_github_run": {
-    "docker_compose": "passed image build/start, migration service, host-side API and web health",
-    "release_workflow": "failure only at Require frontend lockfile committed to the branch",
-    "role_separation": "passed: owner/runtime not superuser or BYPASSRLS; API lacks admin/owner credentials",
-    "backend_postgresql_rls": "passed: migrations twice, release QA, RLS matrix, pip-audit",
+    "frontend": "passed with committed lockfile: npm ci, npm audit --audit-level=high, production build",
+    "committed_frontend_lockfile": "passed",
+    "docker_compose": "passed image build/start, API and web loopback health",
     "production_ready": false,
-    "backup_restore": "passed: database.dump and documents.tar.gz SHA256 OK; restore head 0032_processing_quality_rls; 44 tables; document sentinel PASS",
-    "commit": "212aadf2be82c84f5b3622c7a25e7ce294f76ae1",
-    "frontend": "passed npm ci, npm audit --audit-level=high, production build on temporary generated package-lock"
+    "release_workflow": "success: all four jobs passed",
+    "commit": "add821087123d83619ed360aba9b5e9ddbfc0ec4",
+    "role_separation": "passed: owner/runtime role flags and API credential boundary",
+    "backend_postgresql_rls": "passed: migrations twice, release QA, RLS matrix, pip-audit",
+    "backup_restore": "passed: both SHA-256 checks, DB restored to 0032_processing_quality_rls (44 tables), document sentinel restored"
   },
   "current_branch_changes_pending_ci": {
-    "commit": "212aadf2be82c84f5b3622c7a25e7ce294f76ae1",
-    "status": "no code fixes pending CI; only committed frontend package-lock gate remains",
-    "artifact": "temporary npm-generated lockfile candidate is available in GitHub Actions artifact 13660698809",
+    "commit": "none",
+    "remaining_release_acceptance": "browser E2E, independent security review, functional and legal/hosting acceptance",
+    "status": "all GitHub Actions jobs passed on add8210",
     "production_ready": false
   }
 }

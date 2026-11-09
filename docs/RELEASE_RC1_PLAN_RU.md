@@ -1,21 +1,21 @@
 # ПОТОК CRM — план допуска к Release Candidate 1
 
 **Текущая базовая версия:** `0.25.0-pilot`  
-**Статус:** `NO-GO` — подготовка к RC1, не коммерческий релиз.  
+**Статус:** полный GitHub Actions Release Gate `PASS` на commit `add8210`; общий допуск RC1/production остаётся `NO-GO` до закрытия остальных приёмочных ворот.
 **Правило:** ни один пункт не закрывается по наличию кода или статическому анализу. Нужен воспроизводимый лог успешной проверки.
 
 ## 1. Контрольные ворота RC1
 
 | Ворота | Что считается доказательством | Текущий статус |
 |---|---|---|
-| Backend regression | Полный QA runner, все тесты, включая PostgreSQL suite | Частично: 197 тестов; PostgreSQL suite не запускался |
-| PostgreSQL migrations | Чистая PostgreSQL 16 DB: `alembic upgrade head`; повторный запуск без ошибок | Не проверено |
-| Least privilege | `potok_runtime` не владелец, не SUPERUSER, без BYPASSRLS; права проверены SQL | Не проверено |
-| Tenant isolation | Положительные и отрицательные cross-tenant тесты по tenant-owned сущностям | Частично: есть базовый RLS test, не покрывает все домены |
-| Frontend | Зафиксированный `package-lock.json`, `npm ci`, `npm run build` | Блокер: lockfile отсутствует |
-| Docker | Успешные сборки API и web образов, запуск с PostgreSQL, healthchecks | Не проверено; локальный Docker недоступен |
+| Backend regression | Полный QA runner, все тесты, включая PostgreSQL suite | PASS в GitHub Actions `add8210` |
+| PostgreSQL migrations | Чистая PostgreSQL 16 DB: `alembic upgrade head`; повторный запуск без ошибок | PASS: upgrade выполнен дважды |
+| Least privilege | `potok_runtime` не владелец, не SUPERUSER, без BYPASSRLS; права проверены SQL | PASS в Compose smoke |
+| Tenant isolation | Положительные и отрицательные cross-tenant тесты по tenant-owned сущностям | RLS matrix и PostgreSQL integration прошли в CI |
+| Frontend | Зафиксированный `package-lock.json`, `npm ci`, `npm run build` | PASS: lockfile закоммичен, npm ci, audit и build прошли |
+| Docker | Успешные сборки API и web образов, запуск с PostgreSQL, healthchecks | PASS: Compose smoke, API/web loopback health прошли |
 | Browser E2E | Регистрация/вход/выход, CSRF/Origin, роли, критические бизнес-потоки | Не проверено |
-| Backup/restore | Восстановление БД и файлов из резервной копии в чистую среду | Не проверено |
+| Backup/restore | Восстановление БД и файлов из резервной копии в чистую среду | PASS: SHA-256, head `0032_processing_quality_rls`, 44 таблицы, документный sentinel |
 | Security | Проверка секретов, CORS, cookies, загрузок/скачиваний, tenant boundaries; независимый pentest | Не проверено |
 | Legal / hosting | Юридическая проверка 152-ФЗ, локализации, договоров и выбранного российского хостинга | Не проверено |
 | Functional acceptance | Подписанные сценарии тендеров, закупок, склада, логистики, финансов и документов | Не проверено |
@@ -178,3 +178,9 @@ GitHub Actions commit `f95f478` passed image build, Compose startup/migrations, 
 | Production readiness | NO-GO — reproducible committed frontend lockfile gate remains open |
 
 Temporary npm candidate artifact: `13660698809`. Он подтверждает генерацию и тестирование настоящего lockfile через npm, но пока не входит в ветку.
+
+## Результат полного Release Gate — 2026-11-09, commit `add8210`
+
+Все job полного workflow завершились успешно: PostgreSQL/backend/RLS, frontend reproducible build, проверка committed lockfile и Docker Compose smoke. Закоммиченный npm lockfile v3 прошёл `npm ci`, `npm audit --audit-level=high` и production build. Backup/restore подтвердил SHA-256, восстановление БД на `0032_processing_quality_rls` (44 таблицы) и восстановление документного sentinel.
+
+CI Release Gate: **PASS**. Общий статус допуска RC1/production: **NO-GO** до browser E2E, независимого security review, функциональной и юридической/hosting приёмки. PR остаётся открытым и не слит в `main`.

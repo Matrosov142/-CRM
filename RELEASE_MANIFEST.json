@@ -15,15 +15,15 @@
   },
   "python_files_compile_checked": 142,
   "automated_tests": "212 passed across 55 selected test files; PostgreSQL RLS integration excluded in offline build environment.",
-  "postgresql_runtime_integration": "passed in GitHub Actions commit 212aadf: PostgreSQL 16 migrations twice, release QA and RLS matrix",
-  "docker_build": "passed in GitHub Actions: all images built; Compose stack started, API/web host checks passed",
-  "frontend_build": "passed on runner-generated npm lock candidate: npm ci, audit and production build; candidate not committed",
+  "postgresql_runtime_integration": "passed in GitHub Actions add8210: migrations twice, release QA and RLS matrix",
+  "docker_build": "passed in GitHub Actions add8210: Compose images built and stack health verified",
+  "frontend_build": "passed with committed frontend/package-lock.json: npm ci, npm audit --audit-level=high, npm run build",
   "server_deployment": "not performed; no remote shell access and no confirmed Russian VPS",
   "static_audit": "passed; 142 Python files syntax checked; 32 Alembic revisions; one root, no branches.",
   "compose_yaml": "parsed successfully",
   "shell_scripts": "bash -n passed",
   "docker_image_build": "passed in GitHub Actions commit 212aadf",
-  "frontend_production_build": "passed in GitHub Actions commit 212aadf on temporary package-lock candidate; committed-lockfile check remains failed",
+  "frontend_production_build": "passed with committed lockfile on add8210",
   "changes": [
     "Added tenant-scoped GET /api/v1/warehouse/reservations with reservation line IDs and remaining quantities, enabling the shipment UI/client to retrieve exact reservation_line_id values for partial shipments.",
     "Added read-only ETP platform registry API for B2B-Center, RTS-Tender, Fabrikant, Sber A and TEK-Torg; clearly reports all connectors as planned/unverified and refuses connection attempts until official API and contractual permissions are verified.",
@@ -94,7 +94,7 @@
   "migration_head": "0032_processing_quality_rls",
   "release_notes": "RC1 preparation hardening only. GitHub Actions commit 212aadf: PostgreSQL/RLS and Python dependency audit PASS; frontend npm ci/audit/build PASS on temporary lockfile candidate; Docker Compose, role separation, backup checksums, database restore (0032_processing_quality_rls, 44 tables) and document sentinel restore PASS. frontend/package-lock.json is not committed, so the release gate remains NO-GO. production_ready=false.",
   "release_blockers": "docs/RELEASE_BLOCKERS_RU.md",
-  "docker_runtime": "passed on GitHub Actions commit 212aadf: API and web reachable through loopback reverse proxy",
+  "docker_runtime": "passed: API and web loopback health, role separation, backup/restore drill",
   "qa": "docs/QA_REPORT_PILOT_0_25.json",
   "release_name": "POTOK CRM RC1 Preparation v0.25",
   "qa_summary": {
@@ -105,14 +105,14 @@
     "static_audit": "passed",
     "sqlalchemy_metadata": "SQLite Base.metadata.create_all passed; 43 tables (inherited from v0.24; not PostgreSQL runtime)",
     "frontend_tsx_syntax": "TypeScript syntax transpilation only; production build not run",
-    "postgresql_rls_runtime": "passed in GitHub Actions commit 212aadf",
-    "frontend_production_build": "passed in GitHub Actions using temporary generated lockfile; committed lockfile gate remains open",
+    "postgresql_rls_runtime": "passed in GitHub Actions add8210",
+    "frontend_production_build": "passed with committed lockfile: npm ci, npm audit high, production build",
     "docker_runtime": "passed Compose startup, API/web health and role checks in GitHub Actions",
     "selected_test_count": 212,
     "compose_yaml": "parsed successfully; services db, db-bootstrap, db-migrate, api, web",
     "shell_scripts": "bash -n passed; workflow run blocks passed bash -n",
     "pilot_up_env_writer": "smoke-tested: four separate secret lines, file mode 0600",
-    "backup_restore": "passed SHA256, DB restore to 0032_processing_quality_rls (44 tables), document sentinel"
+    "backup_restore": "passed SHA-256, database restore to 0032_processing_quality_rls (44 tables), document sentinel"
   },
   "technical_preflight_2026_11_09": {
     "source_archive": "POTOK_CRM_v0.25.2(1).zip; extracted and inspected",
@@ -135,16 +135,19 @@
     "production_ready": false
   },
   "last_completed_github_actions": {
-    "commit": "212aadf2be82c84f5b3622c7a25e7ce294f76ae1",
-    "document_restore": "passed sentinel",
-    "backup_sha256": "passed for database.dump and documents.tar.gz",
-    "frontend_install_audit_build": "passed with temporary npm lock candidate",
-    "docker_compose_health_and_roles": "passed",
     "production_ready": false,
+    "frontend_npm_audit": "passed at high severity threshold",
+    "database_restore": "passed at 0032_processing_quality_rls with 44 tables",
+    "frontend_production_build": "passed",
+    "docker_compose_health_and_roles": "passed",
+    "frontend_npm_ci": "passed, 70 packages added and 71 audited",
+    "release_workflow": "success",
+    "lockfile_commit": "passed, version 3, 121 package entries",
+    "commit": "add821087123d83619ed360aba9b5e9ddbfc0ec4",
     "backend_postgresql_rls": "passed",
-    "release_workflow": "failed only at committed package-lock gate",
-    "database_restore": "passed at 0032_processing_quality_rls, 44 tables"
+    "backup_sha256": "passed for database.dump and documents.tar.gz",
+    "document_restore": "sentinel passed"
   },
   "current_branch_changes_pending_ci": "none",
-  "current_blocker": "frontend/package-lock.json is not committed; temporary npm-generated candidate passed CI install/audit/build and is attached as workflow artifact 13660698809"
+  "remaining_release_acceptance": "Browser E2E, independent security review, functional acceptance and legal/hosting review remain outside the completed CI Release Gate"
 }

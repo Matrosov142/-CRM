@@ -142,3 +142,11 @@
 - Compose smoke прошёл: образы собраны, bootstrap/migration завершились, API и web отвечали через loopback host port, роли `potok_owner`/`potok_runtime` прошли проверки привилегий.
 - Backup/restore drill прошёл: `database.dump` и `documents.tar.gz` совпали с SHA-256; восстановленная БД имеет head `0032_processing_quality_rls` и 44 таблицы; документный sentinel восстановлен.
 - Единственный известный blocker PR gate: lockfile candidate не включён в ветку. Production readiness не подтверждена; **NO-GO** до committed lockfile и зелёного release workflow.
+
+## Frontend lockfile и полный Release Gate — commit add8210
+
+- Добавлен npm-generated `frontend/package-lock.json` v3 из кандидата, созданного и проверенного GitHub runner. SHA-256: `96491406B390CDA4336CE8DFBED6920362748AB83FCCDA98815F39FC425B6714`.
+- Frontend gate на закоммиченном lockfile: `npm ci` добавил 70 пакетов, npm audit проверил 71 пакет без high vulnerabilities, `npm run build` успешно завершился.
+- Полный GitHub Actions Release Gate завершился **success**: PostgreSQL 16 migrations/RLS/backend QA, frontend reproducible build, committed-lockfile check и Docker Compose smoke.
+- Compose smoke проверил API/web через loopback reverse proxy, least-privilege DB роли, SHA-256 backup обоих архивов, PostgreSQL restore на `0032_processing_quality_rls` (44 таблицы) и восстановление файлового sentinel.
+- CI-блокеры закрыты. Production readiness не заявляется: browser E2E, независимый security review, функциональная и юридическая/hosting приёмка остаются отдельными воротами. PR #1 не слит, production deployment не выполнялся.

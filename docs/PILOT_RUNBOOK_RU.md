@@ -1,6 +1,6 @@
 # ПОТОК CRM — запуск технического пилота 0.1
 
-> **Технический статус 2026-11-09:** GitHub Actions commit `212aadf` подтвердил PostgreSQL 16 migrations/RLS, backend QA, frontend `npm ci`/audit/build на временном lockfile candidate, полный Compose smoke, least-privilege role separation и backup/restore drill (SHA-256 обоих архивов, восстановление БД на head `0032_processing_quality_rls` с 44 таблицами, документный sentinel). Единственный оставшийся CI blocker: `frontend/package-lock.json` не закоммичен в ветку; временный candidate доступен в artifact `13660698809`, но не является частью release branch. Статус остаётся NO-GO; production deployment запрещён.
+> **Технический статус 2026-11-09:** полный GitHub Actions Release Gate на commit `add8210` прошёл: PostgreSQL 16 migrations/RLS, backend QA, committed frontend `npm ci`/audit/build, Compose health, разделение DB ролей и backup/restore drill (SHA-256 обоих архивов, восстановление БД на head `0032_processing_quality_rls` с 44 таблицами, документный sentinel). Это закрывает CI-блокеры. Общая production readiness остаётся NO-GO до browser E2E, независимого security review, функциональной и юридической приёмки; production deployment не выполнялся.
 
 ## Назначение
 
