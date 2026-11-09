@@ -95,6 +95,8 @@ jobs:
     timeout-minutes: 15
     name: Frontend reproducible production build
     runs-on: ubuntu-latest
+    outputs:
+      lockfile_present: ${{ steps.lockfile.outputs.present }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -117,7 +119,12 @@ jobs:
         run: npm ci
       - name: Audit frontend dependencies
         working-directory: frontend
-        run: npm audit --audit-level=high
+        run: |
+          set +e
+          npm audit --audit-level=high --json > npm-audit-report.json
+          audit_status=$?
+          cat npm-audit-report.json
+          exit "$audit_status"
       - name: Build production frontend
         working-directory: frontend
         run: npm run build
@@ -126,13 +133,19 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: potok-frontend-package-lock-candidate
-          path: frontend/package-lock.json
+          path: |
+            frontend/package-lock.json
+            frontend/npm-audit-report.json
           if-no-files-found: error
-      - name: Require lockfile committed to the branch
-        if: steps.lockfile.outputs.present != 'true'
-        run: |
-          echo "npm ci, audit and build were run against a runner-generated lockfile candidate. Commit frontend/package-lock.json to make the build reproducible from the branch."
-          exit 1
+
+  frontend-lockfile-committed:
+    name: Require frontend lockfile committed to the branch
+    runs-on: ubuntu-latest
+    needs: [frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require committed package-lock.json
+        run: test -f frontend/package-lock.json
 
   docker-smoke:
     timeout-minutes: 25
@@ -140,9 +153,16 @@ jobs:
     runs-on: ubuntu-latest
     # The Compose stack is an independent release surface. Run it even when
     # the frontend lockfile/build gate fails so runtime and restore defects are visible.
-    needs: [backend-postgres]
+    needs: [backend-postgres, frontend]
+    if: always() && needs.backend-postgres.result == 'success' && needs.frontend.result != 'cancelled'
     steps:
       - uses: actions/checkout@v4
+      - name: Download runner-generated npm lockfile candidate
+        if: needs.frontend.outputs.lockfile_present != 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: potok-frontend-package-lock-candidate
+          path: frontend
       - name: Create CI-only secrets
         run: |
           umask 077
