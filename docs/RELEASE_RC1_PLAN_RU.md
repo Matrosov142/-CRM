@@ -161,3 +161,7 @@ RC1 допускается только после зелёного CI по back
 - Host-side проверка показала отказ подключения к `127.0.0.1:18080`; `docker compose ps` не показывал published host port для `web`, поэтому role separation и backup/restore проверки были пропущены.
 - В ветке разделена внутренняя сеть `backend` (DB/API) и `ingress` (только web вместе с backend для проксирования); web host binding остаётся loopback-only. Добавлен контрактный тест Compose.
 - Повторный Actions run ожидается. Не считать опубликование web-порта, Docker smoke или backup/restore закрытыми.
+
+## Docker and backup gate update — 2026-11-09
+
+GitHub Actions commit `f95f478` passed image build, Compose startup/migrations, host-side API and web health, and DB role separation. Backup drill did not start: the tracked script is mode `100644` and workflow attempted direct execution (`Permission denied`). The gate now invokes it through Bash, as documented in this runbook. Checksums and database/document restore remain open pending CI. Frontend npm install/audit/build passed with a temporary generated lock; committed lockfile gate still fails.

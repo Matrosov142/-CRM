@@ -127,3 +127,10 @@
 - The host-side smoke could not connect to `127.0.0.1:18080`; `docker compose ps` showed no published host port for `web`, despite the declared loopback mapping. The role and backup/restore steps were consequently skipped.
 - Fixed the network topology in the working branch: API/DB stay on the internal `backend` network; `web` now also joins a separate `ingress` bridge while retaining the loopback-only host mapping. Added a deployment contract assertion.
 - This network change still requires a new GitHub Actions run; host ingress and backup/restore are not yet marked PASS.
+
+## Backup drill invocation issue, GitHub Actions commit f95f478
+
+- Compose build/startup, Alembic migrations, host-side API/web health, and PostgreSQL role-separation checks passed.
+- Backup/restore stopped before creating the archive: `ops/backup-pilot.sh` is tracked as mode `100644`, while CI invoked it as an executable and got `Permission denied`.
+- Updated CI to invoke the script explicitly with `bash`, matching the runbook. Archive checksums, PostgreSQL restore, and document restore remain unverified until the next run.
+- `frontend/package-lock.json` is still missing from the branch; the temporary candidate did pass frontend install/audit/build.

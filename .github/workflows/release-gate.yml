@@ -205,7 +205,7 @@ jobs:
       - name: Run backup, checksum, database restore and document restore drill
         run: |
           docker compose --env-file .env.pilot -f compose.pilot.yml exec -T api sh -c 'mkdir -p /var/lib/potok-crm/documents/rc1-drill && printf "rc1-backup-ok" > /var/lib/potok-crm/documents/rc1-drill/sentinel.txt'
-          BACKUP_DIR=./backups ./ops/backup-pilot.sh
+          BACKUP_DIR=./backups bash ./ops/backup-pilot.sh
           BACKUP_PATH="$(find ./backups -mindepth 1 -maxdepth 1 -type d | head -n 1)"
           (cd "$BACKUP_PATH" && sha256sum -c SHA256SUMS)
           test -s "$BACKUP_PATH/database.dump"

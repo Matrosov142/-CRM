@@ -50,19 +50,18 @@
     "production_ready": false
   },
   "last_completed_github_run": {
-    "docker_compose": "partial: image builds, bootstrap/migrations and API healthcheck passed; host ingress at 127.0.0.1:18080 failed because no published host port was active",
-    "backend_postgresql_rls": "passed: migrations twice, release QA, RLS matrix, pip-audit",
-    "backup_restore": "not run: host-side Compose smoke stopped before role and restore steps",
+    "backup_restore": "failed before backup: workflow directly executed mode 100644 script and received Permission denied",
+    "frontend": "passed on temporary lockfile: npm ci, audit, production build",
     "production_ready": false,
-    "committed_frontend_lockfile": "failed: not present in branch",
-    "frontend": "passed on temporary lockfile: npm ci, npm audit --audit-level=high, production build",
-    "commit": "cc308c375a8e04b7dfed5c11ee684eafb9d593d8"
+    "backend_postgresql_rls": "passed: migrations twice, QA, RLS matrix, pip-audit",
+    "committed_frontend_lockfile": "failed gate: missing from branch",
+    "commit": "f95f478510bddd6ffe11db44cc717d0ab1d2a669",
+    "docker_compose": "passed: image build, startup/migrations, host-side API/web health and PostgreSQL role separation"
   },
   "current_branch_changes_pending_ci": {
-    "production_ready": false,
-    "compose_fix": "web connected to a separate ingress bridge in addition to internal backend; loopback-only published port retained",
-    "contract_test": "added assertion for web network topology",
     "commit": "pending commit",
-    "backup_restore": "not yet run"
+    "backup_restore": "checksum, DB restore and document restore not yet verified",
+    "backup_workflow_fix": "invoke mode 100644 ops/backup-pilot.sh through bash",
+    "production_ready": false
   }
 }

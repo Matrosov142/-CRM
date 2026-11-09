@@ -134,13 +134,14 @@
     "production_ready": false
   },
   "last_completed_github_actions": {
-    "commit": "2035a784a5ce6012449a75a9bfdca503e645d5a4",
+    "docker_build_migrations_host_health": "passed",
+    "production_ready": false,
+    "backup_restore": "failed before backup: mode 100644 script executed directly",
+    "runtime_role_separation": "passed",
+    "frontend_npm_ci_audit_build": "passed with runner-generated lockfile candidate",
+    "commit": "f95f478510bddd6ffe11db44cc717d0ab1d2a669",
     "backend_postgresql_rls": "passed",
-    "committed_lockfile_gate": "failed: absent from branch",
-    "frontend_npm_ci_audit_build": "passed with temporary lockfile candidate",
-    "backup_restore": "not run",
-    "docker_compose": "failed: db-migrate Settings required DATABASE_URL and JWT_SECRET",
-    "production_ready": false
+    "committed_lockfile_gate": "failed: absent from branch"
   },
-  "current_branch_changes_pending_ci": "Uncommitted Compose configuration and QA documentation changes; rerun pending after branch commit"
+  "current_branch_changes_pending_ci": "Workflow updated to invoke non-executable backup script via bash; complete restore drill pending"
 }
