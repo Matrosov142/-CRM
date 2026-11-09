@@ -114,6 +114,13 @@ jobs:
         if: steps.lockfile.outputs.present != 'true'
         working-directory: frontend
         run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Emit verified lockfile candidate for branch update
+        if: steps.lockfile.outputs.present != 'true'
+        working-directory: frontend
+        run: |
+          printf 'LOCKFILE_BASE64_BEGIN\n'
+          base64 -w0 package-lock.json
+          printf '\nLOCKFILE_BASE64_END\n'
       - name: Install exact dependency tree
         working-directory: frontend
         run: npm ci
