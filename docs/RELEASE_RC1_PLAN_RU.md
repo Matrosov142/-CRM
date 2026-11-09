@@ -188,3 +188,11 @@ CI Release Gate: **PASS**. Общий статус допуска RC1/production
 ## Актуальное состояние — 2026-11-09, commit d736f94db43a6120f557f3125a90fea408ecebf7
 
 GitHub Actions Release Gate run [42593724186](https://github.com/Matrosov142/-CRM/actions/runs/42593724186) завершился успешно: PostgreSQL 16 migration/RLS/backend QA, frontend committed lockfile/npm ci/audit/build, lockfile assertion и Docker Compose health/roles/backup/restore. Ранее приведённые локальные ограничения и промежуточные падения ниже являются историей, а не текущим состоянием этих ворот. Открытыми остаются browser E2E, независимый security review, функциональная и юридическая/hosting приёмка. PR #1 не слит; production deployment не выполнялся.
+
+## Текущий статус проверки — 2026-11-09
+
+Текущий commit `5c200aebed06d2742263e13d65f42d6182d92ab4` содержит исправления после последнего завершённого прогона и ожидает собственного GitHub Actions результата. Последний завершённый Release Gate: [run 42600832811](https://github.com/Matrosov142/-CRM/actions/runs/42600832811), проверял `e4fa14870e97b2dc66bc93e0cf22551527430ff6`: backend/PostgreSQL 16/RLS, frontend lockfile/npm ci/audit/build и Docker/Compose/backup/restore прошли; Browser E2E упал при преобразовании выбранной строки RFQ в закупку. Лог показал, что код сначала вставлял закупку с `total_amount=0`, нарушая PostgreSQL constraint; исправление расчёта до вставки уже отправлено в текущий commit, но ещё не подтверждено прогоном.
+
+Промежуточный Chromium прогон подтвердил регистрацию через интерфейс, cookie-сессию, защитные заголовки nginx, создание тендера и позиции, сохранение безопасного текста XSS-payload, CSRF отказ, запрос поставщику и выбор предложения. Сквозной E2E полного потока пока НЕ пройден. В ответ RFQ добавлен идентификатор строки, без которого API предложения/выбора не мог быть вызван корректно. Не считать это исправление проверенным до следующего workflow.
+
+Статус остаётся **NO-GO**: Browser E2E не завершён; независимый penetration/security review, бизнес-приёмка и юридическая/hosting-проверка не выполнялись. `production_ready=false`; PR #1 открыт, не слит; production deployment не выполнялся.

@@ -154,3 +154,13 @@
 ## Актуальное состояние — 2026-11-09, commit d736f94db43a6120f557f3125a90fea408ecebf7
 
 GitHub Actions Release Gate run [42593724186](https://github.com/Matrosov142/-CRM/actions/runs/42593724186) завершился успешно: PostgreSQL 16 migration/RLS/backend QA, frontend committed lockfile/npm ci/audit/build, lockfile assertion и Docker Compose health/roles/backup/restore. Ранее приведённые локальные ограничения и промежуточные падения ниже являются историей, а не текущим состоянием этих ворот. Открытыми остаются browser E2E, независимый security review, функциональная и юридическая/hosting приёмка. PR #1 не слит; production deployment не выполнялся.
+
+## Состояние контрольных ворот — 2026-11-09
+
+- Текущий head `5c200aebed06d2742263e13d65f42d6182d92ab4` ожидает CI. Последний завершённый Release Gate [42600832811](https://github.com/Matrosov142/-CRM/actions/runs/42600832811), head `e4fa14870e97b2dc66bc93e0cf22551527430ff6`: backend/PostgreSQL/RLS, frontend `npm ci`/audit/build, lockfile assertion и Compose/backup/restore прошли; Browser E2E упал при создании procurement draft.
+- Подтверждённая причина: первоначальный `total_amount=0.00` нарушал `ck_procurement_order_amount_positive` во время flush. Сумма теперь считается до INSERT; регрессионный контракт добавлен. Повторное подтверждение E2E ожидается.
+- Браузерным Chromium уже реально проверены регистрация, cookie и security headers, создание тендера/позиции, экранирование XSS-payload, CSRF отказ. RFQ detail теперь включает `id` строки для дальнейшего предложения и выбора.
+- Исправлен дефект Post-commit refresh при transaction-local RLS: tenant context восстанавливается до перечитывания тендера/позиции/калькуляции.
+- Не заявлены успешными: полный браузерный бизнес-поток, независимый security review, функциональная бизнес-приёмка и юридический/hosting review.
+
+**Решение:** остаётся **NO-GO**, `production_ready=false`; PR №1 не слит, deployment не выполнялся.

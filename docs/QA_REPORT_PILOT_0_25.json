@@ -1,6 +1,6 @@
 {
   "release": "0.25.0-pilot",
-  "generated_at_utc": "2026-11-09T16:29:18+07:00",
+  "generated_at_utc": "2026-11-09T17:36:10+07:00",
   "python_files": 142,
   "compileall": {
     "passed": true,
@@ -20,16 +20,16 @@
     "output": "........................................................................ [ 33%]\n........................................................................ [ 67%]\n....................................................................     [100%]\n212 passed in 1.46s\n"
   },
   "postgresql_integration": {
-    "status": "passed in GitHub Actions run 42593724186 at d736f94: PostgreSQL 16 migrations twice, release QA and RLS matrix",
+    "status": "passed in GitHub Actions run 42600832811 at e4fa148: PostgreSQL 16 migrations twice, release QA and RLS matrix; 33 Alembic revisions.",
     "configured": true
   },
   "frontend": {
     "package_lock_present": true,
     "package_lock_sha256": "96491406B390CDA4336CE8DFBED6920362748AB83FCCDA98815F39FC425B6714",
-    "production_build": "passed with committed lockfile: npm ci (70 packages), npm audit --audit-level=high (71 audited), npm run build",
+    "production_build": "passed with committed lockfile: npm ci, npm audit --audit-level=high, npm run build in run 42600832811.",
     "package_lock_version": 3
   },
-  "docker_runtime": "passed in GitHub Actions run 42593724186: full Compose build/start, API/web health, role separation, backup/restore",
+  "docker_runtime": "passed in GitHub Actions run 42600832811: Compose build/start, API/web health, role separation, backup/restore to 0033_company_registration_rls.",
   "production_ready": false,
   "technical_preflight_2026_11_09": {
     "source_archive": "POTOK_CRM_v0.25.2(1).zip; extracted and inspected",
@@ -52,22 +52,24 @@
     "production_ready": false
   },
   "last_completed_github_run": {
-    "frontend": "passed with committed lockfile: npm ci, npm audit --audit-level=high, production build",
+    "frontend": "passed: committed lockfile, npm ci, npm audit high threshold, production build",
     "committed_frontend_lockfile": "passed",
-    "docker_compose": "passed image build/start, API and web loopback health",
+    "docker_compose": "passed build/start, API/web health, role separation and backup/restore",
     "production_ready": false,
-    "release_workflow": "success: all four jobs passed",
-    "commit": "d736f94db43a6120f557f3125a90fea408ecebf7",
+    "release_workflow": "failure: browser E2E RFQ-to-procurement conversion failed; backend, frontend, lockfile and Docker jobs passed",
+    "commit": "e4fa14870e97b2dc66bc93e0cf22551527430ff6",
     "role_separation": "passed: owner/runtime role flags and API credential boundary",
-    "backend_postgresql_rls": "passed: migrations twice, release QA, RLS matrix, pip-audit",
-    "backup_restore": "passed: both SHA-256 checks, DB restored to 0032_processing_quality_rls (44 tables), document sentinel restored",
-    "run_id": 42593724186,
-    "run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42593724186"
+    "backend_postgresql_rls": "passed: migrations twice, release QA/RLS matrix, pip-audit",
+    "backup_restore": "passed: SHA-256, database restore to 0033_company_registration_rls, document sentinel",
+    "run_id": 42600832811,
+    "run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42600832811"
   },
   "current_branch_changes_pending_ci": {
-    "commit": "none at d736f94",
+    "production_ready": false,
     "remaining_release_acceptance": "browser E2E, independent security review, functional and legal/hosting acceptance",
-    "status": "all four Release Gate jobs passed in run 42593724186",
-    "production_ready": false
-  }
+    "commit": "5c200aebed06d2742263e13d65f42d6182d92ab4",
+    "status": "current RFQ-to-procurement amount fix not yet validated by Actions; previous run exposed total_amount=0 constraint violation"
+  },
+  "current_branch_sha": "5c200aebed06d2742263e13d65f42d6182d92ab4",
+  "current_branch_release_gate_status": "pending: latest completed run 42600832811 failed Browser E2E before the procurement amount fix in current SHA; no current-SHA run available yet"
 }

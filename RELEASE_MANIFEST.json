@@ -91,28 +91,28 @@
     "RFQ line to tender-position traceability with tenant-scoped composite FK",
     "processing job/operation/material ORM metadata models"
   ],
-  "migration_head": "0032_processing_quality_rls",
-  "release_notes": "RC1 technical preparation only. GitHub Actions Release Gate run 42593724186 on d736f94db43a6120f557f3125a90fea408ecebf7 passed all four jobs: PostgreSQL/RLS/backend QA, frontend npm ci/audit/build, committed-lockfile assertion, Compose health/roles/backup/restore (database head 0032_processing_quality_rls, 44 tables, document sentinel). Browser E2E, independent security review, functional and legal/hosting acceptance remain open; production_ready=false.",
+  "migration_head": "0033_company_registration_rls",
+  "release_notes": "RC1 technical preparation only. Current branch head 5c200aebed06d2742263e13d65f42d6182d92ab4 is pending CI. Latest completed Release Gate run 42600832811 on e4fa148 failed only in browser E2E while converting selected RFQ lines into procurement drafts: PostgreSQL rejected temporary total_amount=0 before the code assigned the actual total; fixed in current head but not yet revalidated. Backend/PostgreSQL/RLS, committed npm lockfile/npm ci/audit/build, and Compose health/roles/backup/restore passed in that run. Browser E2E and independent security, functional, and legal/hosting acceptance remain open; production_ready=false.",
   "release_blockers": "docs/RELEASE_BLOCKERS_RU.md",
-  "docker_runtime": "PASS in GitHub Actions run 42593724186: API/web loopback health, DB role separation, backup and database/document restore drill.",
+  "docker_runtime": "PASS in Release Gate run 42600832811: Compose build/start, API/web health, PostgreSQL role separation, backup checksums and DB/document restore; restored Alembic head 0033_company_registration_rls.",
   "qa": "docs/QA_REPORT_PILOT_0_25.json",
   "release_name": "POTOK CRM RC1 Preparation v0.25",
   "qa_summary": {
     "python_files_compilechecked": 142,
-    "alembic_revisions": 32,
+    "alembic_revisions": 33,
     "selected_tests_passed": true,
     "selected_test_files": 55,
     "static_audit": "passed",
     "sqlalchemy_metadata": "SQLite Base.metadata.create_all passed; 43 tables (inherited from v0.24; not PostgreSQL runtime)",
-    "frontend_tsx_syntax": "Production build passed with npm ci and committed lockfile in GitHub Actions run 42593724186.",
-    "postgresql_rls_runtime": "PASS in GitHub Actions run 42593724186: migrations twice, release QA and RLS matrix.",
-    "frontend_production_build": "passed with committed lockfile: npm ci, npm audit high, production build",
-    "docker_runtime": "PASS in GitHub Actions run 42593724186: Compose startup, API/web health and role checks.",
+    "frontend_tsx_syntax": "PASS: npm ci, npm audit --audit-level=high and production build in run 42600832811.",
+    "postgresql_rls_runtime": "PASS in run 42600832811: migrations twice, release QA/RLS matrix and dependency audit.",
+    "frontend_production_build": "PASS: committed lockfile npm ci, npm audit --audit-level=high, production build; run 42600832811.",
+    "docker_runtime": "PASS in run 42600832811: Compose health, role separation and backup/restore.",
     "selected_test_count": 212,
     "compose_yaml": "parsed successfully; services db, db-bootstrap, db-migrate, api, web",
     "shell_scripts": "bash -n passed; workflow run blocks passed bash -n",
     "pilot_up_env_writer": "smoke-tested: four separate secret lines, file mode 0600",
-    "backup_restore": "passed SHA-256, database restore to 0032_processing_quality_rls (44 tables), document sentinel"
+    "backup_restore": "PASS in run 42600832811: SHA-256 checks, DB restore to 0033_company_registration_rls, document sentinel."
   },
   "technical_preflight_2026_11_09": {
     "source_archive": "POTOK_CRM_v0.25.2(1).zip; extracted and inspected",
@@ -137,19 +137,26 @@
   "last_completed_github_actions": {
     "production_ready": false,
     "frontend_npm_audit": "passed at high severity threshold",
-    "database_restore": "passed at 0032_processing_quality_rls with 44 tables",
+    "database_restore": "passed at 0033_company_registration_rls",
     "frontend_production_build": "passed",
     "docker_compose_health_and_roles": "passed",
-    "frontend_npm_ci": "passed, 70 packages added and 71 audited",
-    "release_workflow": "success",
-    "lockfile_commit": "passed, version 3, 121 package entries",
-    "commit": "d736f94db43a6120f557f3125a90fea408ecebf7",
+    "frontend_npm_ci": "passed",
+    "release_workflow": "failure: browser E2E failed during RFQ-to-procurement draft; other Release Gate jobs passed",
+    "lockfile_commit": "passed, version 3",
+    "commit": "e4fa14870e97b2dc66bc93e0cf22551527430ff6",
     "backend_postgresql_rls": "passed",
     "backup_sha256": "passed for database.dump and documents.tar.gz",
     "document_restore": "sentinel passed",
-    "run_id": 42593724186,
-    "run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42593724186"
+    "run_id": 42600832811,
+    "run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42600832811"
   },
-  "current_branch_changes_pending_ci": "none at d736f94; four Release Gate jobs passed.",
-  "remaining_release_acceptance": "Browser E2E, independent security review, functional acceptance and legal/hosting review remain."
+  "current_branch_changes_pending_ci": {
+    "production_ready": false,
+    "remaining_release_acceptance": "complete browser E2E, independent security review, functional and legal/hosting acceptance",
+    "commit": "5c200aebed06d2742263e13d65f42d6182d92ab4",
+    "status": "Fixes for RLS context after tender commits, RFQ line identifiers and procurement amount-before-insert are present; no Actions run is yet associated with current head. Latest completed run 42600832811 failed E2E before latest procurement amount fix."
+  },
+  "remaining_release_acceptance": "Browser E2E, independent security review, functional acceptance and legal/hosting review remain.",
+  "current_branch_sha": "5c200aebed06d2742263e13d65f42d6182d92ab4",
+  "current_branch_release_gate_status": "pending; current head fixes the observed procurement draft amount constraint failure; must pass full Release Gate before claiming clean gate"
 }
