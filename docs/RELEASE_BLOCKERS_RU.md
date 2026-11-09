@@ -130,3 +130,15 @@
 ## Актуальное состояние — 2026-11-09, commit d736f94db43a6120f557f3125a90fea408ecebf7
 
 GitHub Actions Release Gate run [42593724186](https://github.com/Matrosov142/-CRM/actions/runs/42593724186) завершился успешно: PostgreSQL 16 migration/RLS/backend QA, frontend committed lockfile/npm ci/audit/build, lockfile assertion и Docker Compose health/roles/backup/restore. Ранее приведённые локальные ограничения и промежуточные падения ниже являются историей, а не текущим состоянием этих ворот. Открытыми остаются browser E2E, независимый security review, функциональная и юридическая/hosting приёмка. PR #1 не слит; production deployment не выполнялся.
+
+## Итог текущей проверки RC1 — 2026-11-09
+
+GitHub Actions Release Gate [42606663027](https://github.com/Matrosov142/-CRM/actions/runs/42606663027) на `c62da9a67c6343474cd670860dc9369ae143286e` прошёл все 5/5 jobs; CI [42606663458](https://github.com/Matrosov142/-CRM/actions/runs/42606663458) также успешен. Это supersedes прежние Pilot v0.25 блокеры ниже в части runtime-проверок.
+
+**Закрыто автоматизированными проверками:** PostgreSQL 16 миграции/RLS и backend QA; `npm ci`, `npm audit --audit-level=high` (0 уязвимостей) и production build; реальный Chromium E2E через disposable Compose/nginx; Compose health и DB role separation; backup SHA-256 и восстановление PostgreSQL до `0033_company_registration_rls` (44 таблицы) вместе с document sentinel. Browser E2E прошёл синтетический tender → RFQ/offer → procurement approval → частичные поступления (включая брак) → multi-batch reservation → partial shipment → delivery variance → finance payment → PDF upload/download, плюс auth/session/CSRF/Origin/RBAC/tender tenant isolation.
+
+**Подтверждённые дефекты исправлены и покрыты regression checks:** RLS transaction context после commit перед ORM refresh; недостающие RFQ/procurement line IDs в API; вставка закупки с временной нулевой суммой под DB check constraint; employee `id` vs `membership_id`; Decimal в JSONB audit details.
+
+**Остаются блокерами допуска к рабочему пилоту:** независимая security assessment/penetration test; проверка целевого production TLS/reverse proxy, мониторинга, ротации/восстановления секретов и RTO/RPO; формальная подпись бизнес-владельца по функциональным сценариям; юридическое и hosting заключение по 152-ФЗ/локализации/договорам. Release Gate использовал только синтетические данные и disposable сервисы. Не использовать реальные клиентские/финансовые данные до закрытия этих пунктов.
+
+Итог: `production_ready=false`, **NO-GO для пилота с рабочими данными**. PR №1 открыт и не слит; `main` не менялся; production deployment не выполнялся.
