@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Response, Request
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 from app.config import settings
 from app.database import get_db
@@ -8,9 +9,34 @@ from app.security import hash_password, verify_password, create_access_token
 from app.tenant_context import set_user_context, set_tenant_context
 from app.login_throttle import enforce_login_throttle, record_login_failure, prune_old_login_failures
 import secrets
+import uuid
 from datetime import datetime, timedelta, timezone
 
 router = APIRouter(prefix="/api/v1/auth", tags=["Авторизация"])
+
+def _create_company_with_director(db: Session, company_name: str, email: str, password: str):
+    company_id = uuid.uuid4()
+    user = User(email=email, password_hash=hash_password(password))
+    try:
+        db.add(user)
+        db.flush()
+        # The INSERT-only bootstrap policy is limited to this selected company id
+        # and transaction. It does not grant company reads or updates.
+        db.execute(text("SELECT set_config('app.bootstrap_registration', 'on', true)"))
+        db.execute(text("SELECT set_config('app.bootstrap_company_id', :company_id, true)"),
+                   {"company_id": str(company_id)})
+        set_user_context(db, user.id)
+        company = Company(id=company_id, name=company_name.strip())
+        db.add(company)
+        db.flush()
+        membership = Membership(company_id=company.id, user_id=user.id, role="director")
+        db.add(membership)
+        db.commit()
+        return user, company, membership
+    except Exception:
+        db.rollback()
+        raise
+
 
 @router.post("/register-company", response_model=TokenResponse, status_code=201)
 def register_company(payload: RegisterCompanyRequest, db: Session = Depends(get_db)):
@@ -19,16 +45,7 @@ def register_company(payload: RegisterCompanyRequest, db: Session = Depends(get_
     email = str(payload.email).lower()
     if db.query(User).filter(User.email == email).first():
         raise HTTPException(status_code=409, detail="Пользователь уже существует")
-    company = Company(name=payload.company_name.strip())
-    user = User(email=email, password_hash=hash_password(payload.password))
-    try:
-        db.add_all([company, user])
-        db.flush()
-        db.add(Membership(company_id=company.id, user_id=user.id, role="director"))
-        db.commit()
-    except Exception:
-        db.rollback()
-        raise
+    user, company, _ = _create_company_with_director(db, payload.company_name, email, payload.password)
     return TokenResponse(access_token=create_access_token(str(user.id), str(company.id), "director"),
                          company_id=company.id, role="director")
 
@@ -139,13 +156,8 @@ def session_register_company(payload: RegisterCompanyRequest, request: Request, 
     email = str(payload.email).lower()
     if db.query(User).filter(User.email == email).first():
         raise HTTPException(status_code=409, detail="Пользователь уже существует")
-    company = Company(name=payload.company_name.strip())
-    user = User(email=email, password_hash=hash_password(payload.password))
-    try:
-        db.add_all([company, user]); db.flush()
-        db.add(Membership(company_id=company.id, user_id=user.id, role="director")); db.commit()
-    except Exception:
-        db.rollback(); raise
+    user, company, _ = _create_company_with_director(db, payload.company_name, email, payload.password)
+    set_tenant_context(db, user.id, company.id)
     _set_browser_session(response, _create_browser_session(db, user.id, company.id, "director", request.headers.get("user-agent")))
     return {"company_id": str(company.id), "role": "director", "authenticated": True}
 

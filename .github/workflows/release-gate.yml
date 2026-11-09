@@ -264,7 +264,7 @@ jobs:
           docker compose --env-file .env.pilot -f compose.pilot.yml exec -T db sh -c 'PGPASSWORD="$POSTGRES_PASSWORD" createdb -U potok_admin potok_restore_test'
           cat "$BACKUP_PATH/database.dump" | docker compose --env-file .env.pilot -f compose.pilot.yml exec -T db sh -c 'PGPASSWORD="$POSTGRES_PASSWORD" pg_restore --exit-on-error -U potok_admin -d potok_restore_test --no-owner'
           RESTORED_HEAD="$(docker compose --env-file .env.pilot -f compose.pilot.yml exec -T db sh -c 'PGPASSWORD="$POSTGRES_PASSWORD" psql -U potok_admin -d potok_restore_test -Atc "SELECT version_num FROM alembic_version"')"
-          test "$RESTORED_HEAD" = "0032_processing_quality_rls"
+          test "$RESTORED_HEAD" = "0033_company_registration_rls"
           RESTORED_TABLES="$(docker compose --env-file .env.pilot -f compose.pilot.yml exec -T db sh -c 'PGPASSWORD="$POSTGRES_PASSWORD" psql -U potok_admin -d potok_restore_test -Atc "SELECT count(*) FROM information_schema.tables WHERE table_schema = '\''public'\'' AND table_type = '\''BASE TABLE'\''"')"
           test "$RESTORED_TABLES" -gt 0
           mkdir -p /tmp/potok-documents-restored

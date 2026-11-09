@@ -29,6 +29,9 @@ def expect(result, status=200):
 
 
 def register(page, company, email):
+    responses = []
+    page.on("response", lambda r: responses.append((r.status, r.url, r.text()))
+            if r.url.endswith("/api/v1/auth/session/register-company") else None)
     page.goto(BASE, wait_until="networkidle")
     page.get_by_role("button", name="Создать компанию").first.click()
     page.get_by_label("Название компании").fill(company)
@@ -38,7 +41,7 @@ def register(page, company, email):
     try:
         page.get_by_role("heading", name="Панель директора").wait_for(timeout=15000)
     except Exception as exc:
-        raise AssertionError(f"Browser registration did not establish a session. UI={page.locator('body').inner_text()} cookies={owner_cookies(page)}") from exc
+        raise AssertionError(f"Browser registration did not establish a session. UI={page.locator('body').inner_text()} cookies={owner_cookies(page)} responses={responses}") from exc
 
 
 def owner_cookies(page):

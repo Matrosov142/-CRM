@@ -19,7 +19,7 @@ def test_ci_performs_a_real_backup_restore_drill():
     assert "pg_restore --exit-on-error" in workflow
     assert "potok_restore_test" in workflow
     assert "rc1-backup-ok" in workflow
-    assert "0032_processing_quality_rls" in workflow
+    assert "0033_company_registration_rls" in workflow
     assert 'test -s "$BACKUP_PATH/database.dump"' in workflow
     assert "SELECT version_num FROM alembic_version" in workflow
 
