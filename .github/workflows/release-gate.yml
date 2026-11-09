@@ -100,8 +100,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Require committed lockfile
-        run: test -f frontend/package-lock.json
+      - name: Check for committed lockfile
+        id: lockfile
+        run: |
+          if test -f frontend/package-lock.json; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Generate temporary npm lockfile candidate
+        if: steps.lockfile.outputs.present != 'true'
+        working-directory: frontend
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
       - name: Install exact dependency tree
         working-directory: frontend
         run: npm ci
@@ -111,6 +121,18 @@ jobs:
       - name: Build production frontend
         working-directory: frontend
         run: npm run build
+      - name: Upload npm lockfile candidate
+        if: always() && steps.lockfile.outputs.present != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: potok-frontend-package-lock-candidate
+          path: frontend/package-lock.json
+          if-no-files-found: error
+      - name: Require lockfile committed to the branch
+        if: steps.lockfile.outputs.present != 'true'
+        run: |
+          echo "npm ci, audit and build were run against a runner-generated lockfile candidate. Commit frontend/package-lock.json to make the build reproducible from the branch."
+          exit 1
 
   docker-smoke:
     timeout-minutes: 25
