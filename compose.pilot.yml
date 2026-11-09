@@ -93,7 +93,7 @@ services:
         condition: service_healthy
     ports:
       - "127.0.0.1:18080:8080"
-    networks: [backend]
+    networks: [backend, ingress]
     security_opt:
       - no-new-privileges:true
 
@@ -104,3 +104,4 @@ volumes:
 networks:
   backend:
     internal: true
+  ingress: {}

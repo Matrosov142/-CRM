@@ -120,3 +120,10 @@
 - Исправлено в `compose.pilot.yml`: миграционный контейнер получает owner `DATABASE_URL` и JWT secret только на время миграции; API credentials остаются runtime-only.
 - Ошибка исправлена в рабочей ветке после последнего завершённого CI run; миграции Compose и следующий backup/restore drill ожидают повторного GitHub Actions.
 - Полный релизный статус по-прежнему **NO-GO**.
+
+## Docker host ingress issue, GitHub Actions commit cc308c3
+
+- Compose images built, one-time bootstrap and Alembic migration completed successfully, and the API healthcheck became healthy.
+- The host-side smoke could not connect to `127.0.0.1:18080`; `docker compose ps` showed no published host port for `web`, despite the declared loopback mapping. The role and backup/restore steps were consequently skipped.
+- Fixed the network topology in the working branch: API/DB stay on the internal `backend` network; `web` now also joins a separate `ingress` bridge while retaining the loopback-only host mapping. Added a deployment contract assertion.
+- This network change still requires a new GitHub Actions run; host ingress and backup/restore are not yet marked PASS.

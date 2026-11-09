@@ -154,3 +154,10 @@ RC1 допускается только после зелёного CI по back
 - `frontend/package.json` фиксирует версии прямых зависимостей, но `frontend/package-lock.json` и альтернативного lockfile нет. В среде есть Node.js и pnpm, но `npm` отсутствует; создать lockfile для `npm ci` здесь нельзя. Не генерировать фиктивный lock.
 - Python/pytest, Bash, PostgreSQL client/server и Docker CLI недоступны. Backend тесты, compileall, YAML/shell tooling, PostgreSQL/RLS, npm ci/build и Compose smoke не запускались.
 - Требуется создать npm lockfile в среде с npm и затем выполнить release workflow. Статус остаётся **NO-GO**.
+
+## Дополнение по Compose ingress — 2026-11-09
+
+- Последний успешный этап Compose: образы собраны, PostgreSQL bootstrap и migrations прошли, API healthcheck стал healthy.
+- Host-side проверка показала отказ подключения к `127.0.0.1:18080`; `docker compose ps` не показывал published host port для `web`, поэтому role separation и backup/restore проверки были пропущены.
+- В ветке разделена внутренняя сеть `backend` (DB/API) и `ingress` (только web вместе с backend для проксирования); web host binding остаётся loopback-only. Добавлен контрактный тест Compose.
+- Повторный Actions run ожидается. Не считать опубликование web-порта, Docker smoke или backup/restore закрытыми.

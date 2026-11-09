@@ -22,6 +22,9 @@ def test_pilot_web_port_is_loopback_only_and_db_is_not_published():
     assert '127.0.0.1:18080:8080' in compose
     assert '5432:' not in compose
     assert '8000:' not in compose
+    web = compose.split("  web:", 1)[1].split("volumes:", 1)[0]
+    assert "networks: [backend, ingress]" in web
+    assert "  backend:\n    internal: true\n  ingress: {}" in compose
 
 
 def test_pilot_disables_open_registration_and_api_docs():
