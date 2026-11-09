@@ -8,6 +8,7 @@ def test_postgres_ci_workflow_runs_migrations_and_rls_tests():
     assert "postgres:16" in workflow
     assert "alembic upgrade head" in workflow
     assert "python -m pytest -q" in workflow
+    assert "--ignore=tests/e2e" in workflow
     assert "NOBYPASSRLS" in workflow
     assert "REVOKE UPDATE, DELETE ON audit_events" in workflow
 

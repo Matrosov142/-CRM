@@ -62,5 +62,5 @@ jobs:
         run: |
           python -m compileall -q app migrations tests
           python tools/release_audit.py
-      - name: Full test suite including PostgreSQL RLS
-        run: python -m pytest -q
+      - name: Backend and PostgreSQL suite (browser E2E runs in Release Gate)
+        run: python -m pytest -q --ignore=tests/e2e
