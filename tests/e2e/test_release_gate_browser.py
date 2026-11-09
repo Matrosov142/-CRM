@@ -50,6 +50,17 @@ def test_browser_release_gate_business_and_security():
         register(page, company_name, email)
         cookie = next(c for c in owner_context.cookies() if c["name"] == "potok_session")
         assert cookie["httpOnly"] and cookie["sameSite"] == "Strict"
+        asset_url = page.evaluate("() => document.querySelector('script[type=module]')?.src")
+        assert asset_url
+        asset_headers = page.evaluate("""async (url) => {
+          const r=await fetch(url); return Object.fromEntries(['x-content-type-options','referrer-policy','x-frame-options','permissions-policy'].map(k=>[k,r.headers.get(k)]));
+        }""", asset_url)
+        assert asset_headers == {
+            "x-content-type-options":"nosniff",
+            "referrer-policy":"strict-origin-when-cross-origin",
+            "x-frame-options":"DENY",
+            "permissions-policy":"camera=(), microphone=(), geolocation=()",
+        }
         expect(api(page, "/api/v1/companies/current"))
 
         # The live React interface creates a tender and its position.
@@ -112,7 +123,9 @@ def test_browser_release_gate_business_and_security():
         reservation = expect(api(page, "/api/v1/warehouse/reservations", "POST", {
             "reference":f"RES-{suffix}","reason":"E2E частичная отгрузка","lines":[{"stock_batch_id":batch["id"],"quantity":"7"}]
         }), 201)
-        reservation_line = next(x for r in expect(api(page, "/api/v1/warehouse/reservations?status=active" ) if r["id"] == reservation["id"] for x in r["lines"])
+        active_reservations = expect(api(page, "/api/v1/warehouse/reservations?status=active"))
+        reservation_row = next(r for r in active_reservations if r["id"] == reservation["id"])
+        reservation_line = reservation_row["lines"][0]
         shipment = expect(api(page, "/api/v1/warehouse/shipments", "POST", {
             "shipment_number":f"SHIP-{suffix}","reservation_id":reservation["id"],"carrier":"Тест Перевозчик","destination":"Адрес тест",
             "delivery_estimate_id":estimate["id"],"lines":[{"reservation_line_id":reservation_line["id"],"quantity":"3"}]
