@@ -51,7 +51,7 @@ def owner_cookies(page):
 
 def test_browser_release_gate_business_and_security():
     suffix = uuid.uuid4().hex[:10]
-    email, company_name = f"owner-{suffix}@example.test", f"E2E Company {suffix}"
+    email, company_name = f"owner-{suffix}@example.com", f"E2E Company {suffix}"
     tender_number = f"E2E-{suffix}"
 
     with sync_playwright() as p:
@@ -174,7 +174,7 @@ def test_browser_release_gate_business_and_security():
         # A separate company cannot list or address the first company's tender.
         other = browser.new_context()
         other_page = other.new_page()
-        register(other_page, f"Other E2E {suffix}", f"other-{suffix}@example.test")
+        register(other_page, f"Other E2E {suffix}", f"other-{suffix}@example.com")
         assert expect(api(other_page, "/api/v1/tenders")) == []
         expect(api(other_page, f"/api/v1/tenders/{tender['id']}"), 404)
 
@@ -184,7 +184,7 @@ def test_browser_release_gate_business_and_security():
         expect(api(untrusted, "/api/v1/auth/session/logout", "POST", {}), 403)
 
         # Role separation and individual session revocation are verified through browser contexts.
-        manager_email = f"manager-{suffix}@example.test"
+        manager_email = f"manager-{suffix}@example.com"
         invite = expect(api(page, "/api/v1/employees/invitations", "POST", {
             "email":manager_email,"role":"procurement_manager"
         }), 201)
