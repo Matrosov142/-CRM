@@ -42,6 +42,8 @@ services:
     entrypoint: ["/bin/sh", "ops/db-migrate.sh"]
     environment:
       DB_OWNER_PASSWORD: ${DB_OWNER_PASSWORD:?Create .env.pilot first}
+      DATABASE_URL: postgresql+psycopg://potok_owner:${DB_OWNER_PASSWORD}@db:5432/potok_crm
+      JWT_SECRET: ${JWT_SECRET:?Create .env.pilot first}
     depends_on:
       db-bootstrap:
         condition: service_completed_successfully

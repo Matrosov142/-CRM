@@ -15,15 +15,15 @@
   },
   "python_files_compile_checked": 142,
   "automated_tests": "212 passed across 55 selected test files; PostgreSQL RLS integration excluded in offline build environment.",
-  "postgresql_runtime_integration": "not executed; psycopg and disposable test databases unavailable in build environment",
-  "docker_build": "not executed; Docker unavailable in build environment",
-  "frontend_build": "not executed; package-lock.json absent and npm dependencies unavailable",
+  "postgresql_runtime_integration": "passed on GitHub Actions commit 2035a78: PostgreSQL 16 migrations twice, QA and RLS matrix",
+  "docker_build": "GitHub Actions built all images on commit 2035a78; Compose db-migrate then failed due missing settings; compose fix awaits CI",
+  "frontend_build": "GitHub Actions npm ci, high-level audit and production build passed on runner-generated lockfile; package-lock.json is not yet committed",
   "server_deployment": "not performed; no remote shell access and no confirmed Russian VPS",
   "static_audit": "passed; 142 Python files syntax checked; 31 Alembic revisions; one root, no branches.",
   "compose_yaml": "parsed successfully",
   "shell_scripts": "bash -n passed",
-  "docker_image_build": "not executed; Docker CLI unavailable",
-  "frontend_production_build": "not executed; npm dependency installation did not complete in build environment",
+  "docker_image_build": "passed on GitHub Actions commit 2035a78 with temporary lockfile; runtime startup failed during db-migrate",
+  "frontend_production_build": "passed on GitHub Actions commit 2035a78 with temporary npm lockfile; reproducible committed lockfile gate still fails",
   "changes": [
     "Added tenant-scoped GET /api/v1/warehouse/reservations with reservation line IDs and remaining quantities, enabling the shipment UI/client to retrieve exact reservation_line_id values for partial shipments.",
     "Added read-only ETP platform registry API for B2B-Center, RTS-Tender, Fabrikant, Sber A and TEK-Torg; clearly reports all connectors as planned/unverified and refuses connection attempts until official API and contractual permissions are verified.",
@@ -74,7 +74,8 @@
     "PostgreSQL privilege hardening: split bootstrap admin, non-superuser schema owner and runtime roles; run Alembic as potok_owner; added legacy pilot-volume role migration and CI assertions for role flags and table ownership.",
     "Runtime secret isolation: moved PostgreSQL admin bootstrap and schema migrations into separate one-shot Compose jobs; API container now receives only the potok_runtime database URL. First-director creation runs in a one-off bootstrap container.",
     "Privileged database tasks moved into separate short-lived db-bootstrap and db-migrate Compose jobs. API container now receives only runtime DATABASE_URL and JWT secret; first-director bootstrap is run in a one-off container with temporary admin credential injection. Startup waits for and removes completed privileged job containers.",
-    "Separated PostgreSQL startup into db-bootstrap (admin), db-migrate (non-superuser schema owner) and API (runtime-only credentials); removed completed secret-bearing job containers after startup; moved first-director bootstrap to a one-shot db-bootstrap command."
+    "Separated PostgreSQL startup into db-bootstrap (admin), db-migrate (non-superuser schema owner) and API (runtime-only credentials); removed completed secret-bearing job containers after startup; moved first-director bootstrap to a one-shot db-bootstrap command.",
+    "Raised pinned frontend Vite from 6.0.5 to 6.4.5 after npm audit identified the vulnerable Vite/esbuild dependency chain; CI npm audit and production build passed using a temporary lockfile candidate."
   ],
   "added_modules": [
     "delivery cost estimation: carrier vs own fleet",
@@ -131,5 +132,15 @@
     "docker_compose_smoke": "not run: Docker CLI unavailable",
     "backup_restore": "not run: Docker/Bash unavailable",
     "production_ready": false
-  }
+  },
+  "last_completed_github_actions": {
+    "commit": "2035a784a5ce6012449a75a9bfdca503e645d5a4",
+    "backend_postgresql_rls": "passed",
+    "committed_lockfile_gate": "failed: absent from branch",
+    "frontend_npm_ci_audit_build": "passed with temporary lockfile candidate",
+    "backup_restore": "not run",
+    "docker_compose": "failed: db-migrate Settings required DATABASE_URL and JWT_SECRET",
+    "production_ready": false
+  },
+  "current_branch_changes_pending_ci": "Uncommitted Compose configuration and QA documentation changes; rerun pending after branch commit"
 }

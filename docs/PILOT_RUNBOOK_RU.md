@@ -1,6 +1,6 @@
 # ПОТОК CRM — запуск технического пилота 0.1
 
-> **Технический статус 2026-11-09:** release workflow теперь сохраняет ошибку QA при записи лога через `tee` (`pipefail`). Frontend сборка блокируется отсутствующим `frontend/package-lock.json`. Не запускайте `npm ci`, пока lockfile не будет создан в среде с npm и включён в пакет. В текущей среде нет npm, Python, Bash, PostgreSQL или Docker. Резервное копирование и восстановление в этой итерации не выполнялись; перед пилотом проведите CI backup/restore drill и сохраните лог.
+> **Технический статус 2026-11-09:** GitHub Actions подтвердил PostgreSQL 16 migrations/RLS, backend QA и frontend `npm ci`/audit/build на временном lockfile candidate. Сам `frontend/package-lock.json` ещё не включён в ветку, поэтому воспроизводимая сборка остаётся блокером. Docker smoke выявил и подготовил исправление: одноразовому `db-migrate` нужны `DATABASE_URL` и `JWT_SECRET` для загрузки metadata/settings; Compose теперь передаёт owner URL и JWT, API по-прежнему использует только runtime credentials. Повторный CI проверит исправление. Backup/restore drill ещё не пройден; не запускайте production deployment до успешного полного smoke и восстановления.
 
 ## Назначение
 
@@ -41,6 +41,8 @@ bash ops/pilot-up.sh
 4. Создаёт `potok_owner` и `potok_runtime` через `potok_admin`.
 5. Применяет миграции от имени non-superuser `potok_owner`.
 6. Выдаёт `potok_runtime` ограниченные права и запускает API и web.
+
+`db-migrate` кратковременно получает `DB_OWNER_PASSWORD`, owner `DATABASE_URL` и `JWT_SECRET`, поскольку Alembic импортирует приложение и его настройки. Это отдельный одноразовый контейнер; постоянно работающий `api` получает только runtime `DATABASE_URL` и `JWT_SECRET`. Штатный `ops/pilot-up.sh` удаляет завершившиеся bootstrap/migration containers после успешного запуска.
 
 Проверка готовности:
 

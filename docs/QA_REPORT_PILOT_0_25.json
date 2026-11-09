@@ -1,6 +1,6 @@
 {
   "release": "0.25.0-pilot",
-  "generated_at_utc": "2026-11-08T17:30:24.548860+00:00",
+  "generated_at_utc": "2026-11-09T00:30:24.54886+07:00",
   "python_files": 142,
   "compileall": {
     "passed": true,
@@ -48,5 +48,24 @@
     "docker_compose_smoke": "not run: Docker CLI unavailable",
     "backup_restore": "not run: Docker/Bash unavailable",
     "production_ready": false
+  },
+  "last_completed_github_run": {
+    "commit": "2035a784a5ce6012449a75a9bfdca503e645d5a4",
+    "backup_restore": "not run because Docker stack startup stopped at db-migrate",
+    "production_ready": false,
+    "docker_compose": "failed: db-migrate settings validation required DATABASE_URL and JWT_SECRET; fix prepared in compose.pilot.yml, awaiting CI",
+    "frontend": "passed on temporary npm-generated lockfile: npm ci, npm audit --audit-level=high, npm run build",
+    "backend_postgresql_rls": "passed: Alembic upgrade twice, release QA, RLS matrix, pip-audit",
+    "committed_frontend_lockfile": "failed gate: frontend/package-lock.json is not committed"
+  },
+  "current_branch_changes_pending_ci": {
+    "production_ready": false,
+    "backup_restore": "not yet run",
+    "runbook_updated": true,
+    "compose_fix": "db-migrate receives owner DATABASE_URL and JWT_SECRET required by imported app Settings",
+    "release_plan_updated": true,
+    "changelog_updated": true,
+    "commit": "pending branch commit",
+    "release_manifest_updated": true
   }
 }

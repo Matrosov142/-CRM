@@ -113,3 +113,10 @@
 - Проверка committed `frontend/package-lock.json` ожидаемо FAIL: candidate существует только как CI artifact, в ветку он ещё не добавлен.
 - Docker-образы собираются с candidate lockfile, но `db-migrate` завершился с exit 1; health, role-separation и backup/restore drill пока не запускались. В следующий Docker smoke добавлен вывод статуса и логов Compose при ошибке запуска.
 - Релиз остаётся **NO-GO** до committed lockfile, диагностики/исправления db-migrate и успешного повторного полного smoke/restore.
+
+## Docker Compose дефект, подтверждённый логами GitHub
+
+- Повторный release gate с временным lockfile прошёл frontend install/audit/build, но Compose `db-migrate` падал при импорте `app.config.Settings`: отсутствовали обязательные `DATABASE_URL` и `JWT_SECRET`.
+- Исправлено в `compose.pilot.yml`: миграционный контейнер получает owner `DATABASE_URL` и JWT secret только на время миграции; API credentials остаются runtime-only.
+- Ошибка исправлена в рабочей ветке после последнего завершённого CI run; миграции Compose и следующий backup/restore drill ожидают повторного GitHub Actions.
+- Полный релизный статус по-прежнему **NO-GO**.

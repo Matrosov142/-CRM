@@ -90,6 +90,15 @@ RC1 допускается только после зелёного CI по back
 
 **Решение:** NO-GO. Это локально проверенная подготовительная сборка, не релиз и не доказательство runtime-готовности.
 
+## Обновлённый статус GitHub Actions — 2026-11-09
+
+- Commit `2035a78`: Backend + PostgreSQL 16 + RLS прошёл; Alembic upgrade дважды, полный QA runner, RLS matrix и pip-audit успешны.
+- Frontend прошёл `npm ci`, `npm audit --audit-level=high` и production build на временном npm-generated lockfile после обновления Vite до 6.4.5. Отдельный gate подтверждает, что `frontend/package-lock.json` пока не закоммичен; это остаётся блокером воспроизводимого релизного билда.
+- Docker образы собрались с временным lockfile, но `db-migrate` падал при импорте Settings из-за отсутствующих `DATABASE_URL` и `JWT_SECRET`. Это подтверждённое окружение/Compose несоответствие исправлено в `compose.pilot.yml`; повторный CI ещё ожидается.
+- Backup/restore drill не запускался, так как stack не прошёл миграцию. Не считать Docker или backup gate пройденными до зелёного workflow и сохранённых логов.
+
+**Текущий статус:** NO-GO до committed lockfile и полного успешного Docker/backup-restore прогона. Production deployment запрещён.
+
 
 ## PostgreSQL privilege separation — обязательная проверка
 
