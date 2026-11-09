@@ -1,5 +1,15 @@
 # ПОТОК CRM — RC1 hardening iteration
 
+## CI regression fixes 2026-11-09
+
+- Сокращены Alembic revision IDs, превышавшие PostgreSQL `alembic_version.version_num` в 32 символа; локальная подготовка истории миграций синхронизирована.
+- Исправлен составной unique key `tender_positions`, необходимый до создания pricing foreign key; добавлена совместимость для БД, уже дошедших до revision 0029.
+- Добавлена revision `0032_processing_quality_rls` для ENABLE/FORCE RLS и tenant policy на production/finished-goods таблицах.
+- `pytest` ограничен версией `>=9.0.3`, закрывающей уязвимость, найденную `pip-audit` в CI.
+- CI теперь создаёт отдельную роль `potok_owner` и применяет миграции от неё. Тест не удаляет append-only audit rows.
+- GitHub Actions подтвердил: аудит зависимостей, миграции до head, повторный upgrade, compileall и static audit прошли. Полная PostgreSQL/RLS матрица ещё падала на незащищённых таблицах; исправление отправлено, ждём повторный CI.
+- Frontend CI пока блокируется отсутствующим `frontend/package-lock.json`; npm build и Docker smoke не проходили.
+
 ## Технический preflight 2026-11-09
 
 - Исправлен release workflow: `set -o pipefail` гарантирует, что ошибка `tools/qa_release.py` не будет скрыта успешным завершением `tee`.

@@ -123,6 +123,6 @@
 ## Состояние на Pilot v0.25
 
 - Maintenance-релиз синхронизировал release markers и манифест; добавлены регрессионные тесты целостности QA-артефактов.
-- Функциональная схема и миграции не изменялись: head остаётся `0031_rfq_tender_position_link`.
+ - Функциональная схема и миграции изменены после CI RLS проверки; текущий head — `0032_processing_quality_rls`.
 - Все прежние блокеры сохраняются: PostgreSQL/RLS runtime, npm lockfile и production build, browser E2E, Docker runtime, backup/restore, penetration testing, legal review и функциональная приёмка.
 - До закрытия блокеров `production_ready=false`; реальные данные не использовать.

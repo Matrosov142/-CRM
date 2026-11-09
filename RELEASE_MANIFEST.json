@@ -90,7 +90,7 @@
     "RFQ line to tender-position traceability with tenant-scoped composite FK",
     "processing job/operation/material ORM metadata models"
   ],
-  "migration_head": "0031_rfq_tender_position_link",
+  "migration_head": "0032_processing_quality_rls",
   "release_notes": "RC1 preparation hardening only. Local QA: 212 selected tests pass; 142 Python files compile; static audit and workflow syntax checks pass. PostgreSQL RLS runtime, frontend build, Docker runtime, dependency audits and backup/restore still require actual CI execution. production_ready=false. Technical preflight 2026-11-09 fixed workflow pipefail; npm lockfile absent and required runtimes unavailable, so no new test/runtime PASS claims. production_ready=false. Technical preflight 2026-11-09 fixed workflow pipefail; npm lockfile absent and required runtimes unavailable, so no new test/runtime PASS claims. production_ready=false.",
   "release_blockers": "docs/RELEASE_BLOCKERS_RU.md",
   "docker_runtime": "not run: Docker CLI/daemon unavailable",

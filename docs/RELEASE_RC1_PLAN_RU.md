@@ -71,7 +71,7 @@ RC1 допускается только после зелёного CI по back
 - Backend CI запускает `pip-audit -r requirements.txt`; frontend CI запускает `npm audit --audit-level=high` после `npm ci`.
 - Backend QA log и JSON report публикуются как отдельный CI artifact для аудита результата.
 - Docker contexts исключают `.env*`, backups, `.git`, тесты и локальные build artifacts.
-- Docker smoke job запускает штатный `ops/backup-pilot.sh`, проверяет SHA-256, восстанавливает dump в отдельную БД, сверяет Alembic head с `0031_rfq_tender_position_link`, проверяет число таблиц и восстанавливает тестовый файл из документового архива.
+ - Docker smoke job запускает штатный `ops/backup-pilot.sh`, проверяет SHA-256, восстанавливает dump в отдельную БД, сверяет Alembic head с `0032_processing_quality_rls`, проверяет число таблиц и восстанавливает тестовый файл из документового архива.
 - Исправлен путь tar-архива документов и добавлена утилита `tar` в API image.
 - Все новые процедуры требуют фактического зелёного workflow. Локальные offline PASS не закрывают эти ворота.
 

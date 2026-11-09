@@ -155,9 +155,6 @@ def test_rls_isolates_tenants_and_audit_is_append_only():
             ).fetchone()[0] is False
 
     finally:
-        with psycopg.connect(ADMIN_URL) as admin:
-            admin.execute("DELETE FROM audit_events WHERE id IN (%s,%s)", (audit_a, audit_b))
-            admin.execute("DELETE FROM audit_events WHERE company_id IN (%s,%s)", (company_a, company_b))
-            admin.execute("DELETE FROM memberships WHERE id IN (%s,%s)", (member_a, member_b))
-            admin.execute("DELETE FROM companies WHERE id IN (%s,%s)", (company_a, company_b))
-            admin.execute("DELETE FROM users WHERE id IN (%s,%s)", (user_a, user_b))
+        # Fixtures intentionally remain in this disposable database: audit_events
+        # are append-only, so cleanup must not attempt to delete their records.
+        pass
