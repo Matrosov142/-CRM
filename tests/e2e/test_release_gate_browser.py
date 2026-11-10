@@ -85,9 +85,9 @@ def test_browser_release_gate_business_and_security():
         xss_payload = 'Тестовая поставка <img src=x onerror="window.e2eXss=1">'
         page.get_by_label("Предмет закупки").fill(xss_payload)
         page.get_by_role("button", name="Сохранить тендер").click()
-        assert expect(api(page, "/api/v1/dashboard/summary"))["open_tenders"] == 1
         tender_card = page.locator("article").filter(has_text=tender_number).first
         tender_card.wait_for(timeout=10000)
+        assert expect(api(page, "/api/v1/dashboard/summary"))["open_tenders"] == 1
         assert xss_payload in tender_card.locator("b").inner_text()
         assert tender_card.locator('img[onerror="window.e2eXss=1"]').count() == 0
         assert page.evaluate("window.e2eXss") is None
