@@ -2,7 +2,7 @@
 
 Рабочие процедуры и формы для оставшихся ворот: [staging checklist](RC1_STAGING_CHECKLIST_RU.md), [backup/restore runbook](RC1_BACKUP_RESTORE_RUNBOOK_RU.md), [шаблон бизнес-приёмки](RC1_BUSINESS_ACCEPTANCE_TEMPLATE_RU.md). Шаблоны подготовлены, но не подтверждают готовность целевой инфраструктуры или прохождение внешних проверок.
 
-> **Технический статус 2026-11-10:** PR #1 открыт, не слит; текущий head `7d8cd2ebbbad63e41d7261af52839c0693c611eb`. Release Gate run 42771942245 прошёл 5/5 jobs, CI run 42771942185 прошёл. В CI включены PostgreSQL/RLS, npm ci/audit/build, Chromium E2E, Compose smoke и disposable backup/restore. NO-GO остаётся до целевых инфраструктурных и внешних проверок; deployment не выполнялся.
+> **Технический статус 2026-11-10:** PR #1 открыт, не слит; проверенный head `60d136c85babec1382955392954f41e050115216`. Release Gate run 42775061333 прошёл 5/5 jobs, CI run 42775061283 прошёл. В CI включены PostgreSQL/RLS, npm ci/audit/build, Chromium E2E, Compose smoke и disposable backup/restore. NO-GO остаётся до целевых инфраструктурных и внешних проверок; deployment не выполнялся.
 
 ## Назначение
 

@@ -95,7 +95,7 @@
     "authenticated user's role is displayed in dashboard header"
   ],
   "migration_head": "0033_company_registration_rls",
-  "release_notes": "RC1 technical candidate. Latest verified PR head 7d8cd2ebbbad63e41d7261af52839c0693c611eb: Release Gate 42771942245 (all five jobs) and CI 42771942185 passed. Automated CI evidence covers PostgreSQL 16 migrations/RLS, backend QA, committed npm lockfile/npm ci/audit/build, synthetic Chromium E2E, Compose health/role separation and disposable DB/document restore. Staging, independent security, target backup encryption/retention/RPO/RTO, formal business acceptance, and legal/hosting review remain open; production_ready=false.",
+  "release_notes": "RC1 technical candidate. Latest verified commit 60d136c85babec1382955392954f41e050115216: Release Gate 42775061333 (all five jobs) and CI 42775061283 passed. CI evidence covers PostgreSQL 16 migrations/RLS, backend QA, committed npm lockfile/npm ci/audit/build, synthetic Chromium E2E, Compose health/role separation and disposable DB/document restore. Staging, independent security, target backup encryption/retention/RPO/RTO, formal business acceptance, and legal/hosting review remain open; production_ready=false.",
   "release_blockers": "docs/RELEASE_BLOCKERS_RU.md",
   "docker_runtime": "PASS in Release Gate run 42770185517: Compose build/start, API/web readiness, DB role separation, backup SHA-256 and restore (0033_company_registration_rls, 44 tables), document sentinel.",
   "qa": "docs/QA_REPORT_PILOT_0_25.json",
@@ -137,21 +137,21 @@
     "production_ready": false
   },
   "last_completed_github_actions": {
-    "commit": "7d8cd2ebbbad63e41d7261af52839c0693c611eb",
+    "commit": "60d136c85babec1382955392954f41e050115216",
     "release_workflow": "success: all five jobs passed",
-    "run_id": 42771942245,
-    "run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42771942245",
-    "ci_run_id": 42771942185,
-    "ci_run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42771942185",
+    "run_id": 42775061333,
+    "run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42775061333",
+    "ci_run_id": 42775061283,
+    "ci_run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42775061283",
     "ci": "success",
     "production_ready": false,
-    "evidence_scope": "PostgreSQL/RLS, backend QA, frontend npm ci/audit/build, synthetic Chromium E2E, Docker Compose smoke and disposable backup/restore, as reported by workflow jobs."
+    "evidence_scope": "PostgreSQL/RLS, backend QA, frontend npm ci/audit/build, synthetic Chromium E2E, Docker Compose smoke and disposable backup/restore."
   },
   "remaining_release_acceptance": "OPEN: independent security assessment; production-like synthetic staging validation (TLS/reverse proxy, network, secrets/rotation, monitoring/alerts, update/rollback); encrypted target backup/restore with separate storage, retention and measured RPO/RTO; formal business acceptance; legal/hosting review.",
-  "last_verified_source_commit": "7d8cd2ebbbad63e41d7261af52839c0693c611eb",
-  "last_verified_release_gate": "PASS: all five jobs and CI passed on 7d8cd2ebbbad63e41d7261af52839c0693c611eb; Release Gate 42771942245, CI 42771942185.",
+  "last_verified_source_commit": "60d136c85babec1382955392954f41e050115216",
+  "last_verified_release_gate": "PASS: all five jobs and CI passed on 60d136c85babec1382955392954f41e050115216; Release Gate 42775061333, CI 42775061283.",
   "last_verified_source_state": {
-    "commit": "7d8cd2ebbbad63e41d7261af52839c0693c611eb",
+    "commit": "60d136c85babec1382955392954f41e050115216",
     "remaining_release_acceptance": "OPEN: independent security assessment; production-like synthetic staging validation (TLS/reverse proxy, network, secrets/rotation, monitoring/alerts, update/rollback); encrypted target backup/restore with separate storage, retention and measured RPO/RTO; formal business acceptance; legal/hosting review.",
     "production_ready": false,
     "status": "automated CI passed; external and target-infrastructure release gates remain open"

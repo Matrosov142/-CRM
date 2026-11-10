@@ -1,6 +1,6 @@
 {
   "release": "0.25.0-pilot",
-  "generated_at_utc": "2026-11-10T07:23:06.555971+00:00",
+  "generated_at_utc": "2026-11-10T07:27:31+00:00",
   "python_files": 148,
   "compileall": {
     "passed": true,
@@ -49,20 +49,20 @@
     "production_ready": false
   },
   "last_completed_github_run": {
-    "commit": "7d8cd2ebbbad63e41d7261af52839c0693c611eb",
-    "run_id": 42771942245,
-    "run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42771942245",
-    "release_workflow": "success: all five jobs passed on PR #1 head; PostgreSQL/RLS, frontend build, Chromium E2E, lockfile assertion, Docker Compose smoke",
-    "ci_run_id": 42771942185,
-    "ci_run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42771942185",
+    "commit": "60d136c85babec1382955392954f41e050115216",
+    "run_id": 42775061333,
+    "run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42775061333",
+    "release_workflow": "success: all five jobs passed; PostgreSQL 16/backend/RLS, frontend production build, Chromium E2E, lockfile assertion and Docker Compose smoke",
+    "ci_run_id": 42775061283,
+    "ci_run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42775061283",
     "ci": "success",
     "production_ready": false
   },
-  "last_verified_source_commit": "7d8cd2ebbbad63e41d7261af52839c0693c611eb",
-  "last_verified_release_gate": "PASS: all five jobs; Release Gate 42771942245, CI 42771942185; head 7d8cd2ebbbad63e41d7261af52839c0693c611eb.",
+  "last_verified_source_commit": "60d136c85babec1382955392954f41e050115216",
+  "last_verified_release_gate": "PASS: all five jobs; Release Gate 42775061333, CI 42775061283; tested commit 60d136c85babec1382955392954f41e050115216.",
   "last_verified_source_state": {
-    "commit": "7d8cd2ebbbad63e41d7261af52839c0693c611eb",
-    "remaining_release_acceptance": "independent security assessment; target staging TLS/reverse proxy, secrets, network, monitoring and rollback validation; encrypted target backup/restore with retention and measured RPO/RTO; formal synthetic business acceptance; legal and hosting review",
+    "commit": "60d136c85babec1382955392954f41e050115216",
+    "remaining_release_acceptance": "independent security assessment; target staging TLS/reverse proxy, secrets/rotation, network, monitoring and rollback validation; encrypted target backup/restore with separate storage, retention and measured RPO/RTO; formal synthetic business acceptance; legal and hosting review",
     "production_ready": false,
     "status": "automated technical Release Gate and CI passed; external and target-infrastructure acceptance remains open"
   },

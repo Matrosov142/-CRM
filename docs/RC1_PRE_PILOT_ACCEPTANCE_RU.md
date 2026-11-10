@@ -2,7 +2,7 @@
 
 Процедуры и формы для оставшихся ворот: [staging](RC1_STAGING_CHECKLIST_RU.md), [backup/restore](RC1_BACKUP_RESTORE_RUNBOOK_RU.md), [бизнес-приёмка](RC1_BUSINESS_ACCEPTANCE_TEMPLATE_RU.md). Они не закрывают ворота без приложенных фактических доказательств и назначенных ответственных.
 
-Актуально на 10 ноября 2026 года. Последний проверенный PR head: `7d8cd2ebbbad63e41d7261af52839c0693c611eb`. Release Gate run [42771942245](https://github.com/Matrosov142/-CRM/actions/runs/42771942245) завершился успешно (5/5 jobs), CI run [42771942185](https://github.com/Matrosov142/-CRM/actions/runs/42771942185) также успешен. На этом head проверены PostgreSQL/RLS, frontend, Chromium E2E и Docker Compose. Локальный preflight ограничен отсутствием pytest, npm, Docker и PostgreSQL.
+Актуально на 10 ноября 2026 года. Последний проверенный PR head: `60d136c85babec1382955392954f41e050115216`. Release Gate run [42775061333](https://github.com/Matrosov142/-CRM/actions/runs/42775061333) завершился успешно (5/5 jobs), CI run [42775061283](https://github.com/Matrosov142/-CRM/actions/runs/42775061283) также успешен. На этом head проверены PostgreSQL/RLS, frontend, Chromium E2E и Docker Compose. Локальный preflight ограничен отсутствием pytest, npm, Docker и PostgreSQL.
 
 ## Статус по пунктам
 
