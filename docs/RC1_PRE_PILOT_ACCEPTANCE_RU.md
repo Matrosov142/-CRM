@@ -1,6 +1,6 @@
 # Контрольный лист допуска ПОТОК CRM к пилоту
 
-Актуально на 10 ноября 2026 года. Текущий проверенный PR head: `42bcbe992103e502b6a13cf6e7f68047852477cc`. Release Gate run [42767968825](https://github.com/Matrosov142/-CRM/actions/runs/42767968825) завершился успешно (5/5 jobs), CI run [42767968913](https://github.com/Matrosov142/-CRM/actions/runs/42767968913) также успешен. На этом commit проверены исправление QA artifact policy, регрессионные тесты, backend/PostgreSQL/RLS, frontend, Chromium E2E и Docker Compose. Локальный preflight ограничен отсутствием pytest, npm, Docker и PostgreSQL.
+Актуально на 10 ноября 2026 года. Последний проверенный кодовый коммит: `42bcbe992103e502b6a13cf6e7f68047852477cc`; синхронизированный docs/manifest commit `0d90eda10b2f4701fe11dfe77190e486461fe79a` проверен Release Gate run [42768632749](https://github.com/Matrosov142/-CRM/actions/runs/42768632749) (5/5 jobs) и CI run [42768633037](https://github.com/Matrosov142/-CRM/actions/runs/42768633037). На этом commit проверены исправление QA artifact policy, регрессионные тесты, backend/PostgreSQL/RLS, frontend, Chromium E2E и Docker Compose. Локальный preflight ограничен отсутствием pytest, npm, Docker и PostgreSQL.
 
 ## Статус по пунктам
 
@@ -20,4 +20,4 @@
 - `python tools/release_audit.py`: прошёл локально; сообщает о демонстрационных KPI как о действующем ограничении.
 - YAML parse для `ci.yml`, `release-gate.yml`, `compose.pilot.yml`, `compose.postgres-test.yml`: прошёл локально.
 - `python tools/qa_release.py`: не прошёл полный тестовый этап в этой среде, поскольку отсутствуют pytest/psycopg и disposable PostgreSQL, npm и Docker. Его отчёт сохраняется отдельно как локальный preflight и больше не заменяет канонический CI QA report.
-- Полный Release Gate run 35 на `42bcbe9` завершился 5/5 успешно; CI run 73 тоже прошёл. Новый backend QA включает добавленный policy regression test.
+- Полный Release Gate run 36 на docs/manifest commit `0d90eda` завершился 5/5 успешно; CI run 75 тоже прошёл. Новый backend QA включает добавленный policy regression test.

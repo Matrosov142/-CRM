@@ -1,6 +1,6 @@
 {
   "release": "0.25.0-pilot",
-  "generated_at_utc": "2026-11-10T06:26:14.441443+00:00",
+  "generated_at_utc": "2026-11-10T06:30:29.385989+00:00",
   "python_files": 147,
   "compileall": {
     "passed": true,
@@ -52,21 +52,21 @@
     "frontend": "passed: npm ci, npm audit high threshold, production build",
     "production_ready": false,
     "backend_postgresql_rls": "passed: migrations twice, release QA/RLS matrix, pip-audit, 59 selected test files",
-    "run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42767968825",
+    "run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42768632749",
     "browser_e2e": "passed: full synthetic browser workflow in real Chromium via disposable Compose/nginx",
-    "ci_run_id": 42767968913,
+    "ci_run_id": 42768633037,
     "committed_frontend_lockfile": "passed, lockfile v3",
-    "release_workflow": "success: all five Release Gate jobs passed, including browser E2E",
-    "commit": "42bcbe992103e502b6a13cf6e7f68047852477cc",
-    "ci_run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42767968913",
-    "run_id": 42767968825,
+    "release_workflow": "success: all five Release Gate jobs passed, including Chromium browser E2E",
+    "commit": "0d90eda10b2f4701fe11dfe77190e486461fe79a",
+    "ci_run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42768633037",
+    "run_id": 42768632749,
     "role_separation": "passed: owner/runtime roles and API credential boundary",
     "backup_restore": "passed: SHA-256, PostgreSQL restored to 0033_company_registration_rls (44 tables), document sentinel"
   },
-  "last_verified_source_commit": "42bcbe992103e502b6a13cf6e7f68047852477cc",
-  "last_verified_release_gate": "PASS: all five Release Gate jobs and CI workflow succeeded on 42bcbe992103e502b6a13cf6e7f68047852477cc; release run 42767968825, CI run 42767968913.",
+  "last_verified_source_commit": "0d90eda10b2f4701fe11dfe77190e486461fe79a",
+  "last_verified_release_gate": "PASS: all five Release Gate jobs and CI workflow succeeded on 0d90eda10b2f4701fe11dfe77190e486461fe79a; release run 42768632749, CI run 42768633037.",
   "last_verified_source_state": {
-    "commit": "42bcbe992103e502b6a13cf6e7f68047852477cc",
+    "commit": "0d90eda10b2f4701fe11dfe77190e486461fe79a",
     "remaining_release_acceptance": "independent security review; target infrastructure/TLS and operational backup RPO/RTO drill; formal business acceptance; legal and hosting review",
     "production_ready": false,
     "status": "all automated Release Gate jobs and CI passed"
