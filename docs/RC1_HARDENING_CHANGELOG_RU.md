@@ -180,5 +180,5 @@ GitHub Actions Release Gate run [42593724186](https://github.com/Matrosov142/-CR
 
 - Найден дефект: локальный QA runner записывал QA JSON в системной кодировке и мог заменить канонический GitHub Actions отчёт частичным результатом без pytest/PostgreSQL/npm/Docker.
 - Изменение: локальный отчёт отделён в игнорируемый `QA_PREFLIGHT_LOCAL.json`; CI продолжает формировать канонический JSON-артефакт; обоим путям задана UTF-8. Добавлены контрактные тесты и проверка UTF-8 JSON в статическом release audit.
-- Текущие локальные проверки: compileall (147 файлов), static audit и YAML parse прошли. Полные pytest/DB/npm/Docker проверки локально недоступны; исправления ожидают новый GitHub Release Gate.
+- Текущие локальные проверки: compileall (147 файлов), static audit и YAML parse прошли. Полные pytest/DB/npm/Docker проверки локально недоступны; исправление и regression tests подтверждены полным Release Gate run 35 и CI run 73 на commit `42bcbe992103e502b6a13cf6e7f68047852477cc`.
 - Контроль инфраструктуры, backup policy/RPO/RTO, независимой security экспертизы, формальной бизнес-приёмки и юридической проверки добавлен в `RC1_PRE_PILOT_ACCEPTANCE_RU.md`; результаты внешних действий не заявляются как выполненные.
