@@ -1,6 +1,6 @@
 {
   "release": "0.25.0-pilot",
-  "generated_at_utc": "2026-11-10T06:56:05.283250+00:00",
+  "generated_at_utc": "2026-11-10T07:23:06.555971+00:00",
   "python_files": 148,
   "compileall": {
     "passed": true,
@@ -49,26 +49,32 @@
     "production_ready": false
   },
   "last_completed_github_run": {
-    "frontend": "passed: npm ci, npm audit high threshold, production build",
-    "production_ready": false,
-    "backend_postgresql_rls": "passed: migrations twice, release QA/RLS matrix, pip-audit, 59 selected test files",
-    "run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42771448005",
-    "browser_e2e": "passed: dashboard counts and role label verified against synthetic company data",
-    "ci_run_id": 42771448090,
-    "committed_frontend_lockfile": "passed, lockfile v3",
-    "release_workflow": "success: all five jobs passed, including Chromium live dashboard counts, cross-company isolation and role label",
-    "commit": "3be10a4f8c0e6b3370f8e619e01cb1ef5a9e9a79",
-    "ci_run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42771448090",
-    "run_id": 42771448005,
-    "role_separation": "passed: owner/runtime roles and API credential boundary",
-    "backup_restore": "passed: SHA-256, PostgreSQL restored to 0033_company_registration_rls (44 tables), document sentinel"
+    "commit": "7d8cd2ebbbad63e41d7261af52839c0693c611eb",
+    "run_id": 42771942245,
+    "run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42771942245",
+    "release_workflow": "success: all five jobs passed on PR #1 head; PostgreSQL/RLS, frontend build, Chromium E2E, lockfile assertion, Docker Compose smoke",
+    "ci_run_id": 42771942185,
+    "ci_run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42771942185",
+    "ci": "success",
+    "production_ready": false
   },
-  "last_verified_source_commit": "3be10a4f8c0e6b3370f8e619e01cb1ef5a9e9a79",
-  "last_verified_release_gate": "PASS: all five Release Gate jobs and CI succeeded on 3be10a4f8c0e6b3370f8e619e01cb1ef5a9e9a79; release run 42771448005, CI run 42771448090.",
+  "last_verified_source_commit": "7d8cd2ebbbad63e41d7261af52839c0693c611eb",
+  "last_verified_release_gate": "PASS: all five jobs; Release Gate 42771942245, CI 42771942185; head 7d8cd2ebbbad63e41d7261af52839c0693c611eb.",
   "last_verified_source_state": {
-    "commit": "3be10a4f8c0e6b3370f8e619e01cb1ef5a9e9a79",
-    "remaining_release_acceptance": "independent security review; target infrastructure/TLS and operational backup RPO/RTO drill; formal business acceptance; legal and hosting review",
+    "commit": "7d8cd2ebbbad63e41d7261af52839c0693c611eb",
+    "remaining_release_acceptance": "independent security assessment; target staging TLS/reverse proxy, secrets, network, monitoring and rollback validation; encrypted target backup/restore with retention and measured RPO/RTO; formal synthetic business acceptance; legal and hosting review",
     "production_ready": false,
-    "status": "all automated Release Gate jobs and CI passed"
+    "status": "automated technical Release Gate and CI passed; external and target-infrastructure acceptance remains open"
+  },
+  "pre_pilot_documentation": {
+    "status": "prepared; not evidence of completed external or target-infrastructure checks",
+    "staging_checklist": "docs/RC1_STAGING_CHECKLIST_RU.md",
+    "backup_restore_runbook": "docs/RC1_BACKUP_RESTORE_RUNBOOK_RU.md",
+    "business_acceptance_template": "docs/RC1_BUSINESS_ACCEPTANCE_TEMPLATE_RU.md",
+    "production_like_staging": "OPEN: target host/domain/TLS, network, secret store/rotation, monitoring/alerts and rollback are not supplied or tested",
+    "target_backup_restore": "OPEN: CI disposable restore passed; target encryption/off-site storage/retention and RPO/RTO are not verified",
+    "business_acceptance": "OPEN: synthetic E2E passed; business rules/metrics and formal owner signoff are pending",
+    "security_review": "OPEN: independent assessment not performed",
+    "legal_hosting_review": "OPEN: applicability and hosting/localization review not performed"
   }
 }

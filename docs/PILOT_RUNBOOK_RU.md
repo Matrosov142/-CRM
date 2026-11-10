@@ -1,6 +1,8 @@
 # ПОТОК CRM — запуск технического пилота 0.1
 
-> **Технический статус 2026-11-09:** Release Gate run 42605391256 на source commit `376066927eb96aa037a18a1bc5f66dd0e41b7b4f` прошёл все пять jobs; CI run 42605391146 тоже PASS. Включены PostgreSQL/RLS, npm ci/audit/build, real Chromium E2E, Compose health/roles и backup/restore (head `0033_company_registration_rls`, 44 таблицы). NO-GO остаётся до независимой security review, формальной функциональной и юридической/hosting-приёмки; deployment не выполнялся.
+Рабочие процедуры и формы для оставшихся ворот: [staging checklist](RC1_STAGING_CHECKLIST_RU.md), [backup/restore runbook](RC1_BACKUP_RESTORE_RUNBOOK_RU.md), [шаблон бизнес-приёмки](RC1_BUSINESS_ACCEPTANCE_TEMPLATE_RU.md). Шаблоны подготовлены, но не подтверждают готовность целевой инфраструктуры или прохождение внешних проверок.
+
+> **Технический статус 2026-11-10:** PR #1 открыт, не слит; текущий head `7d8cd2ebbbad63e41d7261af52839c0693c611eb`. Release Gate run 42771942245 прошёл 5/5 jobs, CI run 42771942185 прошёл. В CI включены PostgreSQL/RLS, npm ci/audit/build, Chromium E2E, Compose smoke и disposable backup/restore. NO-GO остаётся до целевых инфраструктурных и внешних проверок; deployment не выполнялся.
 
 ## Назначение
 

@@ -75,7 +75,8 @@
     "Runtime secret isolation: moved PostgreSQL admin bootstrap and schema migrations into separate one-shot Compose jobs; API container now receives only the potok_runtime database URL. First-director creation runs in a one-off bootstrap container.",
     "Privileged database tasks moved into separate short-lived db-bootstrap and db-migrate Compose jobs. API container now receives only runtime DATABASE_URL and JWT secret; first-director bootstrap is run in a one-off container with temporary admin credential injection. Startup waits for and removes completed privileged job containers.",
     "Separated PostgreSQL startup into db-bootstrap (admin), db-migrate (non-superuser schema owner) and API (runtime-only credentials); removed completed secret-bearing job containers after startup; moved first-director bootstrap to a one-shot db-bootstrap command.",
-    "Raised pinned frontend Vite from 6.0.5 to 6.4.5 after npm audit identified the vulnerable Vite/esbuild dependency chain; CI npm audit and production build passed using a temporary lockfile candidate."
+    "Raised pinned frontend Vite from 6.0.5 to 6.4.5 after npm audit identified the vulnerable Vite/esbuild dependency chain; CI npm audit and production build passed using a temporary lockfile candidate.",
+    "Prepared synthetic-staging checklist, backup/restore runbook and business-acceptance template; documented target/external gates as OPEN. Latest CI evidence on PR head 7d8cd2ebbbad63e41d7261af52839c0693c611eb: Release Gate 42771942245 and CI 42771942185 passed."
   ],
   "added_modules": [
     "delivery cost estimation: carrier vs own fleet",
@@ -94,7 +95,7 @@
     "authenticated user's role is displayed in dashboard header"
   ],
   "migration_head": "0033_company_registration_rls",
-  "release_notes": "RC1 technical candidate. All five Release Gate jobs passed in run 42771448005 on commit 3be10a4f8c0e6b3370f8e619e01cb1ef5a9e9a79; CI run 42771448090 also succeeded. Includes PostgreSQL 16 migrations/RLS/backend QA, committed npm lockfile/npm ci/audit/build, real Chromium E2E, tenant-scoped dashboard counts and role display, Compose health/role separation and DB/document restore at 0033_company_registration_rls (44 tables). Production readiness remains false pending external security, business, legal and hosting acceptance.",
+  "release_notes": "RC1 technical candidate. Latest verified PR head 7d8cd2ebbbad63e41d7261af52839c0693c611eb: Release Gate 42771942245 (all five jobs) and CI 42771942185 passed. Automated CI evidence covers PostgreSQL 16 migrations/RLS, backend QA, committed npm lockfile/npm ci/audit/build, synthetic Chromium E2E, Compose health/role separation and disposable DB/document restore. Staging, independent security, target backup encryption/retention/RPO/RTO, formal business acceptance, and legal/hosting review remain open; production_ready=false.",
   "release_blockers": "docs/RELEASE_BLOCKERS_RU.md",
   "docker_runtime": "PASS in Release Gate run 42770185517: Compose build/start, API/web readiness, DB role separation, backup SHA-256 and restore (0033_company_registration_rls, 44 tables), document sentinel.",
   "qa": "docs/QA_REPORT_PILOT_0_25.json",
@@ -136,31 +137,34 @@
     "production_ready": false
   },
   "last_completed_github_actions": {
-    "commit": "3be10a4f8c0e6b3370f8e619e01cb1ef5a9e9a79",
-    "docker_compose_health_and_roles": "passed",
+    "commit": "7d8cd2ebbbad63e41d7261af52839c0693c611eb",
+    "release_workflow": "success: all five jobs passed",
+    "run_id": 42771942245,
+    "run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42771942245",
+    "ci_run_id": 42771942185,
+    "ci_run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42771942185",
+    "ci": "success",
     "production_ready": false,
-    "document_restore": "sentinel passed",
-    "frontend_production_build": "passed",
-    "lockfile_commit": "passed, version 3, 121 entries",
-    "backend_postgresql_rls": "passed: migrations twice, release QA/RLS matrix, pip-audit, 59 selected test files",
-    "run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42771448005",
-    "release_workflow": "success: all five jobs passed, including browser E2E, tenant-scoped dashboard metrics and role label",
-    "database_restore": "passed at 0033_company_registration_rls with 44 tables",
-    "ci_run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42771448090",
-    "frontend_npm_ci": "passed",
-    "run_id": 42771448005,
-    "backup_sha256": "passed for database.dump and documents.tar.gz",
-    "browser_e2e": "passed: synthetic flows and dashboard counts/cross-company isolation/current-role label",
-    "ci_run_id": 42771448090,
-    "frontend_npm_audit": "passed: zero vulnerabilities at high threshold"
+    "evidence_scope": "PostgreSQL/RLS, backend QA, frontend npm ci/audit/build, synthetic Chromium E2E, Docker Compose smoke and disposable backup/restore, as reported by workflow jobs."
   },
-  "remaining_release_acceptance": "Independent security assessment, external formal business acceptance, legal and hosting review remain; production_ready=false.",
-  "last_verified_source_commit": "3be10a4f8c0e6b3370f8e619e01cb1ef5a9e9a79",
-  "last_verified_release_gate": "PASS: all five Release Gate jobs and CI passed; Release Gate 42771448005, CI 42771448090.",
+  "remaining_release_acceptance": "OPEN: independent security assessment; production-like synthetic staging validation (TLS/reverse proxy, network, secrets/rotation, monitoring/alerts, update/rollback); encrypted target backup/restore with separate storage, retention and measured RPO/RTO; formal business acceptance; legal/hosting review.",
+  "last_verified_source_commit": "7d8cd2ebbbad63e41d7261af52839c0693c611eb",
+  "last_verified_release_gate": "PASS: all five jobs and CI passed on 7d8cd2ebbbad63e41d7261af52839c0693c611eb; Release Gate 42771942245, CI 42771942185.",
   "last_verified_source_state": {
-    "commit": "3be10a4f8c0e6b3370f8e619e01cb1ef5a9e9a79",
-    "remaining_release_acceptance": "independent security assessment; target infrastructure/TLS and operational backup RPO/RTO drill; formal business acceptance; legal and hosting review",
+    "commit": "7d8cd2ebbbad63e41d7261af52839c0693c611eb",
+    "remaining_release_acceptance": "OPEN: independent security assessment; production-like synthetic staging validation (TLS/reverse proxy, network, secrets/rotation, monitoring/alerts, update/rollback); encrypted target backup/restore with separate storage, retention and measured RPO/RTO; formal business acceptance; legal/hosting review.",
     "production_ready": false,
-    "status": "all automated Release Gate jobs passed"
+    "status": "automated CI passed; external and target-infrastructure release gates remain open"
+  },
+  "pre_pilot_documentation": {
+    "status": "prepared; not evidence of completed external or target-infrastructure checks",
+    "staging_checklist": "docs/RC1_STAGING_CHECKLIST_RU.md",
+    "backup_restore_runbook": "docs/RC1_BACKUP_RESTORE_RUNBOOK_RU.md",
+    "business_acceptance_template": "docs/RC1_BUSINESS_ACCEPTANCE_TEMPLATE_RU.md",
+    "production_like_staging": "OPEN: target host/domain/TLS, network, secret store/rotation, monitoring/alerts and rollback are not supplied or tested",
+    "target_backup_restore": "OPEN: CI disposable restore passed; target encryption/off-site storage/retention and RPO/RTO are not verified",
+    "business_acceptance": "OPEN: synthetic E2E passed; business rules/metrics and formal owner signoff are pending",
+    "security_review": "OPEN: independent assessment not performed",
+    "legal_hosting_review": "OPEN: applicability and hosting/localization review not performed"
   }
 }
