@@ -9,15 +9,9 @@ function csrfHeaders(): Record<string,string> {
 }
 
 type Company = { id: string; name: string; status: string };
+type DashboardSummary = { open_tenders: number; authorized_procurement_orders: number; pending_approvals: number; active_reservations: number };
 type DeliveryOption = { method: string; name: string; total: string; delivery_days?: number | null; source: string; breakdown?: Record<string,string> };
 type DeliveryHistory = { id:string; origin:string; destination:string; distance_km_one_way:string; cargo_description:string; options:DeliveryOption[]; selected_option_index:number|null; created_at:string };
-
-const demo = [
-  { label: 'Активные тендеры', value: '18', note: 'Демонстрационные данные', icon: '▤' },
-  { label: 'Заказы в работе', value: '12', note: 'Демонстрационные данные', icon: '⇄' },
-  { label: 'Ожидают согласования', value: '4', note: 'Демонстрационные данные', icon: '◷' },
-  { label: 'Просроченные задачи', value: '3', note: 'Демонстрационные данные', icon: '!' },
-];
 
 export default function App() {
   const [mode, setMode] = useState<'login'|'register'>('login');
@@ -30,6 +24,9 @@ export default function App() {
   const [token, setToken] = useState('cookie-session');
   const [company, setCompany] = useState<Company | null>(null);
   const [loadingCompany, setLoadingCompany] = useState(false);
+  const [dashboardSummary, setDashboardSummary] = useState<DashboardSummary | null>(null);
+  const [dashboardBusy, setDashboardBusy] = useState(false);
+  const [dashboardMessage, setDashboardMessage] = useState('');
   const [section, setSection] = useState<'home'|'tenders'|'delivery'|'shipments'|'security'>('home');
   const [tenders, setTenders] = useState<any[]>([]);
   const [tenderBusy, setTenderBusy] = useState(false);
@@ -87,6 +84,26 @@ export default function App() {
     }).finally(() => { if (!cancelled) setLoadingCompany(false); });
     return () => { cancelled = true; };
   }, [token]);
+
+  async function loadDashboard() {
+    if (!token) return;
+    setDashboardBusy(true);
+    setDashboardMessage('');
+    try {
+      const response = await fetch(`${API}/api/v1/dashboard/summary`, {credentials:'include'});
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.detail || 'Не удалось загрузить показатели компании');
+      setDashboardSummary(data);
+    } catch (err) {
+      setDashboardMessage(err instanceof Error ? err.message : 'Ошибка загрузки показателей');
+      setDashboardSummary(null);
+    } finally { setDashboardBusy(false); }
+  }
+
+  useEffect(() => {
+    if (!token || !company) { setDashboardSummary(null); return; }
+    void loadDashboard();
+  }, [token, company]);
 
   async function submit(e: FormEvent) {
     e.preventDefault(); setBusy(true); setMessage('');
@@ -437,23 +454,19 @@ export default function App() {
             </div>
           )}
         </div> : <>
-        <div className="welcome"><div><div className="eyebrow">ОБЗОР КОМПАНИИ</div><h2>{loadingCompany ? 'Загружаем компанию…' : company?.name || 'Компания'}</h2><p>Ключевые процессы и контроль текущих задач в одном месте.</p></div><div className="date-chip">Рабочая панель</div></div>
-        <div className="demo-banner">ПИЛОТ 0.25 · Показатели ниже демонстрационные, не загружаются из базы. Не использовать для принятия финансовых и складских решений.</div>
-        <div className="kpis">{demo.map((item, i) => <article className="kpi" key={item.label}><div className="kpi-head"><span>{item.label}</span><b>{item.icon}</b></div><strong>{item.value}</strong><small>{item.note}</small></article>)}</div>
-        <div className="dash-grid">
-          <article className="dash-card"><div className="card-title"><h3>Контроль процессов</h3><span>Пример структуры</span></div>
-            <div className="process"><span>Тендеры</span><div><i style={{width:'76%'}}/></div><b>76%</b></div>
-            <div className="process"><span>Закупки</span><div><i style={{width:'58%'}}/></div><b>58%</b></div>
-            <div className="process"><span>Поступление</span><div><i style={{width:'42%'}}/></div><b>42%</b></div>
-            <div className="process"><span>Отгрузки</span><div><i style={{width:'31%'}}/></div><b>31%</b></div>
-          </article>
-          <article className="dash-card"><div className="card-title"><h3>Требуют внимания</h3><span>Демо</span></div>
-            <div className="attention"><b className="dot amber"/>Согласовать заявку на закупку <small>Закупки</small></div>
-            <div className="attention"><b className="dot red"/>Проверить срок поставки <small>Логистика</small></div>
-            <div className="attention"><b className="dot blue"/>Подготовить документы тендера <small>Тендерный отдел</small></div>
-          </article>
+        <div className="welcome"><div><div className="eyebrow">ОБЗОР КОМПАНИИ</div><h2>{loadingCompany ? 'Загружаем компанию…' : company?.name || 'Компания'}</h2><p>Счётчики рассчитаны по данным текущей компании.</p></div><button className="secondary" onClick={loadDashboard} disabled={dashboardBusy}>{dashboardBusy?'Обновляем…':'Обновить показатели'}</button></div>
+        <div className="demo-banner">ПИЛОТ 0.25 · Счётчики показывают записи компании; финансовые суммы и прогнозы здесь не рассчитываются.</div>
+        {dashboardMessage && <div className="message delivery-notice">{dashboardMessage}</div>}
+        <div className="kpis">
+          {[
+            {label:'Открытые тендеры',value:dashboardSummary?.open_tenders, note:'Новые, в анализе, подготовке или подаче',icon:'▤'},
+            {label:'Утверждённые закупки',value:dashboardSummary?.authorized_procurement_orders,note:'Заказы со статусом «утверждён»',icon:'⇄'},
+            {label:'Ожидают согласования',value:dashboardSummary?.pending_approvals,note:'Запросы со статусом «ожидает решения»',icon:'◷'},
+            {label:'Активные резервы',value:dashboardSummary?.active_reservations,note:'Резервы, не снятые с учёта',icon:'▣'},
+          ].map(item=><article className="kpi" key={item.label}><div className="kpi-head"><span>{item.label}</span><b>{item.icon}</b></div><strong>{item.value === undefined ? '—' : item.value}</strong><small>{item.note}</small></article>)}
         </div>
-        <footer className="dash-footer">ПОТОК CRM · Пилот 0.25 · Демонстрационные показатели</footer>
+        <div className="dash-grid"><article className="dash-card"><div className="card-title"><h3>О данных</h3><span>Обновление вручную</span></div><p>Показаны только счётчики по текущей компании. Суммы и прогнозы здесь не рассчитываются.</p><button className="secondary" onClick={loadDashboard} disabled={dashboardBusy}>{dashboardBusy?'Обновляем…':'Обновить данные'}</button></article></div>
+        <footer className="dash-footer">ПОТОК CRM · Пилот 0.25 · Показатели из базы компании</footer>
         </>}
       </section>
     </main>;

@@ -11,7 +11,8 @@ def test_tender_register_is_connected_to_real_api_and_company_list():
     assert "credentials:'include'" in ui
     assert "...csrfHeaders()" in ui
     assert "Тендеры компании" in ui
-    assert "Демонстрационные" in ui
+    assert "/api/v1/dashboard/summary" in ui
+    assert "Демонстрационные данные" not in ui
 
 
 def test_tender_router_handles_unique_constraint_race_and_blank_values():

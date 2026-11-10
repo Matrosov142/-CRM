@@ -73,6 +73,8 @@ def test_browser_release_gate_business_and_security():
             "permissions-policy":"camera=(), microphone=(), geolocation=()",
         }
         expect(api(page, "/api/v1/companies/current"))
+        initial_summary = expect(api(page, "/api/v1/dashboard/summary"))
+        assert initial_summary == {"open_tenders":0,"authorized_procurement_orders":0,"pending_approvals":0,"active_reservations":0}
 
         # The live React interface creates a tender and its position.
         page.get_by_role("link", name="Тендеры").click()
@@ -83,6 +85,7 @@ def test_browser_release_gate_business_and_security():
         xss_payload = 'Тестовая поставка <img src=x onerror="window.e2eXss=1">'
         page.get_by_label("Предмет закупки").fill(xss_payload)
         page.get_by_role("button", name="Сохранить тендер").click()
+        assert expect(api(page, "/api/v1/dashboard/summary"))["open_tenders"] == 1
         tender_card = page.locator("article").filter(has_text=tender_number).first
         tender_card.wait_for(timeout=10000)
         assert xss_payload in tender_card.locator("b").inner_text()
@@ -126,6 +129,11 @@ def test_browser_release_gate_business_and_security():
             "operation":"purchase","limit_amount":"2000.00"
         }))
         expect(api(page, f"/api/v1/procurement/orders/{draft['id']}/authorize", "POST", {"approval_request_id":None}))
+        assert expect(api(page, "/api/v1/dashboard/summary"))["authorized_procurement_orders"] == 1
+        expect(api(page, "/api/v1/access/approval-requests", "POST", {
+            "operation":"purchase","amount":"2500.00","reason":"E2E проверка счётчика согласований"
+        }), 201)
+        assert expect(api(page, "/api/v1/dashboard/summary"))["pending_approvals"] == 1
         expect(api(page, "/api/v1/warehouse/receipts", "POST", {
             "receipt_number":f"REC-{suffix}-1","procurement_order_id":draft["id"],"location":"A-01",
             "lines":[{"procurement_order_line_id":line["id"],"received_quantity":"6","accepted_quantity":"5","defective_quantity":"1","defect_note":"Брак тестовой единицы"}]
@@ -150,6 +158,7 @@ def test_browser_release_gate_business_and_security():
                 {"stock_batch_id":batches[1]["id"],"quantity":"2"},
             ]
         }), 201)
+        assert expect(api(page, "/api/v1/dashboard/summary"))["active_reservations"] == 1
         active_reservations = expect(api(page, "/api/v1/warehouse/reservations?status=active"))
         reservation_row = next(r for r in active_reservations if r["id"] == reservation["id"])
         reservation_line = next(line for line in reservation_row["lines"] if Decimal(line["quantity"]) >= 3)
@@ -178,11 +187,24 @@ def test_browser_release_gate_business_and_security():
         assert downloaded["status"] == 200 and downloaded["type"] == "application/pdf"
         assert bytes(downloaded["bytes"]).startswith(b"%PDF-1.4")
 
+        # The dashboard displays the live company-scoped counts from this flow.
+        page.get_by_role("link", name="Главная").click()
+        page.get_by_role("button", name="Обновить показатели").click()
+        page.wait_for_function("""() => {
+          const cards = [...document.querySelectorAll('.kpi')];
+          const value = label => cards.find(card => card.innerText.includes(label))?.querySelector('strong')?.textContent;
+          return value('Открытые тендеры') === '1'
+            && value('Утверждённые закупки') === '1'
+            && value('Ожидают согласования') === '1'
+            && value('Активные резервы') === '1';
+        }""")
+
         # A separate company cannot list or address the first company's tender.
         other = browser.new_context()
         other_page = other.new_page()
         register(other_page, f"Other E2E {suffix}", f"other-{suffix}@example.com")
         assert expect(api(other_page, "/api/v1/tenders")) == []
+        assert expect(api(other_page, "/api/v1/dashboard/summary")) == {"open_tenders":0,"authorized_procurement_orders":0,"pending_approvals":0,"active_reservations":0}
         expect(api(other_page, f"/api/v1/tenders/{tender['id']}"), 404)
 
         # An untrusted browser Origin with a valid CSRF token is rejected.

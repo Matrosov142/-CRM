@@ -85,7 +85,7 @@ if 'ck_rfq_line_tender_link_pair' not in models_source:
 if 'Позиция тендера не найдена в вашей компании' not in supplier_source:
     errors.append('RFQ creation must validate linked tender position in current tenant.')
 
-# 4. Demo UI must remain explicitly marked as demo; don't present demo KPIs as live.
+# 4. Dashboard indicators must be tenant-scoped database counts, never demo values.
 package_json = (ROOT / 'frontend' / 'package.json').read_text(encoding='utf-8')
 if '"version": "0.25.0"' not in package_json:
     errors.append('Frontend package version must match release 0.25.0.')
@@ -95,9 +95,15 @@ frontend_app = (ROOT / 'frontend' / 'src' / 'App.tsx').read_text(encoding='utf-8
 if "import type { FormEvent } from 'react'" not in frontend_app or "React.FormEvent" in frontend_app:
     errors.append('React form event types must be imported explicitly.')
 frontend = (ROOT / 'frontend' / 'src' / 'App.tsx').read_text(encoding='utf-8')
-for phrase in ('ПИЛОТ 0.25', 'демонстрационные', 'не загружаются из базы'):
+for phrase in ('ПИЛОТ 0.25', '/api/v1/dashboard/summary'):
     if phrase not in frontend:
-        errors.append(f'Pilot UI disclosure missing: {phrase}')
+        errors.append(f'Pilot UI contract missing: {phrase}')
+if 'const demo =' in frontend or 'Просроченные задачи' in frontend:
+    errors.append('Dashboard must not show hard-coded KPI values or unsupported task metrics.')
+dashboard_source = (ROOT / 'app' / 'routers' / 'dashboard.py').read_text(encoding='utf-8')
+for required in ('model.company_id == company_id', 'Tender.status.in_', 'ApprovalRequest.status == "pending"', 'StockReservation.status == "active"'):
+    if required not in dashboard_source:
+        errors.append(f'Dashboard summary tenant/status contract missing: {required}')
 if 'localStorage' in frontend or 'sessionStorage' in frontend:
     errors.append('Bearer token must not be persisted in browser storage.')
 if "/api/v1/auth/session/login" not in frontend or "credentials: 'include'" not in frontend:
@@ -128,8 +134,6 @@ if 'setDeliveryEstimateId(data.id)' not in frontend:
     errors.append('Delivery estimate response ID is not retained for later selection.')
 if 'actual-delivery-cost' not in frontend or 'loadShipments' not in frontend:
     errors.append('Shipment actual delivery cost screen is missing.')
-if 'Демонстрационные данные' in frontend:
-    notes.append('Dashboard KPIs are hard-coded demo values; they are not live CRM metrics.')
 
 # Logout UI must only clear local authenticated state after server-confirmed revocation.
 logout_block = frontend[frontend.find('  async function logout()'):frontend.find('  if (token) {')]
