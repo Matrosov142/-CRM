@@ -11,4 +11,5 @@ backups/
 *.dump
 *.tar.gz
 *.log
+docs/QA_PREFLIGHT_LOCAL.json
 .DS_Store

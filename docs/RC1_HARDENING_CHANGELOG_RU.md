@@ -175,3 +175,10 @@ GitHub Actions Release Gate run [42593724186](https://github.com/Matrosov142/-CR
 - Исправлены подтверждённые интеграционные дефекты: RLS-контекст после commit, missing RFQ/procurement line IDs, промежуточный нулевой total заказа, employee vs membership ID, Decimal в JSONB audit details. Добавлены регрессионные проверки.
 
 Не закрыты: независимый pentest/security sign-off, production TLS/reverse-proxy/hosting drill, формальная бизнес-приёмка и юридическая оценка. Автоматизированный E2E использует только синтетические данные; production deployment не выполнялся. Итоговый статус с реальными данными: **NO-GO**.
+
+## 2026-11-10 — локальная предпилотная проверка
+
+- Найден дефект: локальный QA runner записывал QA JSON в системной кодировке и мог заменить канонический GitHub Actions отчёт частичным результатом без pytest/PostgreSQL/npm/Docker.
+- Изменение: локальный отчёт отделён в игнорируемый `QA_PREFLIGHT_LOCAL.json`; CI продолжает формировать канонический JSON-артефакт; обоим путям задана UTF-8. Добавлены контрактные тесты и проверка UTF-8 JSON в статическом release audit.
+- Текущие локальные проверки: compileall (147 файлов), static audit и YAML parse прошли. Полные pytest/DB/npm/Docker проверки локально недоступны; исправления ожидают новый GitHub Release Gate.
+- Контроль инфраструктуры, backup policy/RPO/RTO, независимой security экспертизы, формальной бизнес-приёмки и юридической проверки добавлен в `RC1_PRE_PILOT_ACCEPTANCE_RU.md`; результаты внешних действий не заявляются как выполненные.

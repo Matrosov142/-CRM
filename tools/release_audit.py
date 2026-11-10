@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 """Offline release audit. Static checks only; never connects to a database/server."""
 from __future__ import annotations
-import ast, re, sys
+import ast, json, re, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 errors: list[str] = []
 notes: list[str] = []
+
+# Canonical QA evidence is consumed by CI and release automation on Linux.
+qa_report_path = ROOT / 'docs' / 'QA_REPORT_PILOT_0_25.json'
+try:
+    json.loads(qa_report_path.read_text(encoding='utf-8'))
+except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+    errors.append(f'QA report must be valid UTF-8 JSON: {exc}')
 
 # 1. Python syntax
 py_files = sorted(p for p in ROOT.rglob('*.py') if not any(x in p.parts for x in ('__pycache__', '.venv')))

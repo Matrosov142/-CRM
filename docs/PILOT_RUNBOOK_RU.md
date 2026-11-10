@@ -178,3 +178,7 @@ Release Gate [42605391256](https://github.com/Matrosov142/-CRM/actions/runs/4260
 Backend/RLS migrations, `compileall` (146 файлов), release/static audit, 58 selected test files, npm ci/audit/build, Compose health/roles и backup/restore прошли. Резервная копия восстановлена в PostgreSQL до `0033_company_registration_rls` (44 таблицы); checksum обоих архивов и файловый sentinel прошли.
 
 Ранее в этом документе приведены исторические блокеры/падения, устранённые следующими итерациями. Текущие внешние блокеры: независимая security оценка, production-like TLS/infra проверка, формальная функциональная подпись, legal/hosting заключение. Не запускать с реальными данными до закрытия этих пунктов. Production deployment не выполнялся.
+
+## Допуск к предпилоту — 2026-11-10
+
+До подключения пилотных клиентских данных пройдите пункты [контрольного листа допуска](RC1_PRE_PILOT_ACCEPTANCE_RU.md): независимая security оценка; тестирование целевого TLS/reverse proxy/мониторинга/секретов в staging; backup encryption, retention и restore с замером RPO/RTO; формальная бизнес-приёмка синтетических сценариев; юридическая и hosting-проверка. GitHub Release Gate использовал только disposable Compose/nginx и синтетические данные, поэтому не подтверждает производственную инфраструктуру. Dashboard KPI демонстрационные, доставка вводится вручную, интеграция с площадками отсутствует. Зафиксируйте эти ограничения в scope пилота либо закройте продуктовые задачи до решения GO. Любой пункт без владельца и evidence оставляет решение NO-GO.

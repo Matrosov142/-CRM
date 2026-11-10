@@ -96,9 +96,16 @@ report = {
     "production_ready": False,
 }
 
-report_path = ROOT / "docs" / "QA_REPORT_PILOT_0_25.json"
+# GitHub Actions runs are the canonical release evidence. A local preflight may
+# have missing tools (pytest, PostgreSQL, npm, Docker), so keep its partial
+# result separate from the checked-in CI report instead of replacing it.
+if os.environ.get("CI", "").lower() == "true":
+    report_name = "QA_REPORT_PILOT_0_25.json"
+else:
+    report_name = "QA_PREFLIGHT_LOCAL.json"
+report_path = ROOT / "docs" / report_name
 report_path.parent.mkdir(parents=True, exist_ok=True)
-report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
+report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 print(json.dumps({
     "release": report["release"],
