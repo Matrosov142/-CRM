@@ -1,0 +1,10 @@
+services:
+  api:
+    environment:
+      ENVIRONMENT: pilot
+      ALLOW_BOOTSTRAP_REGISTRATION: "true"
+      CORS_ORIGINS: "http://127.0.0.1:18080"
+  web:
+    ports:
+      - "127.0.0.1:18080:8080"
+      - "127.0.0.1:18081:8080"

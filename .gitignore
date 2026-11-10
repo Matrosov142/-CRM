@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+node_modules/
+dist/
+backups/
+*.dump
+*.tar.gz
+*.log
+docs/QA_PREFLIGHT_LOCAL.json
+.DS_Store

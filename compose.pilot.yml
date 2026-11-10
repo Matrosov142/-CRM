@@ -1,0 +1,109 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: potok_crm
+      POSTGRES_USER: potok_admin
+      POSTGRES_PASSWORD: ${DB_ADMIN_PASSWORD:?Create .env.pilot first}
+    volumes:
+      - potok_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U potok_admin -d potok_crm"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [backend]
+    security_opt:
+      - no-new-privileges:true
+
+  db-bootstrap:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: "no"
+    entrypoint: ["/bin/sh", "ops/db-bootstrap.sh"]
+    environment:
+      DB_ADMIN_PASSWORD: ${DB_ADMIN_PASSWORD:?Create .env.pilot first}
+      DB_OWNER_PASSWORD: ${DB_OWNER_PASSWORD:?Create .env.pilot first}
+      RUNTIME_DB_PASSWORD: ${RUNTIME_DB_PASSWORD:?Create .env.pilot first}
+      DATABASE_URL: postgresql+psycopg://potok_admin:${DB_ADMIN_PASSWORD}@db:5432/potok_crm
+      JWT_SECRET: ${JWT_SECRET:?Create .env.pilot first}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [backend]
+    security_opt:
+      - no-new-privileges:true
+
+  db-migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: "no"
+    entrypoint: ["/bin/sh", "ops/db-migrate.sh"]
+    environment:
+      DB_OWNER_PASSWORD: ${DB_OWNER_PASSWORD:?Create .env.pilot first}
+      DATABASE_URL: postgresql+psycopg://potok_owner:${DB_OWNER_PASSWORD}@db:5432/potok_crm
+      JWT_SECRET: ${JWT_SECRET:?Create .env.pilot first}
+    depends_on:
+      db-bootstrap:
+        condition: service_completed_successfully
+    networks: [backend]
+    security_opt:
+      - no-new-privileges:true
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      APP_NAME: ПОТОК CRM
+      ENVIRONMENT: pilot
+      DATABASE_URL: postgresql+psycopg://potok_runtime:${RUNTIME_DB_PASSWORD}@db:5432/potok_crm
+      JWT_SECRET: ${JWT_SECRET:?Create .env.pilot first}
+      JWT_ALGORITHM: HS256
+      ACCESS_TOKEN_MINUTES: 20
+      ALLOW_BOOTSTRAP_REGISTRATION: "false"
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://127.0.0.1:18080}
+      DOCUMENT_STORAGE_PATH: /var/lib/potok-crm/documents
+      DOCUMENT_MAX_BYTES: 26214400
+    volumes:
+      - potok_documents:/var/lib/potok-crm/documents
+    depends_on:
+      db-migrate:
+        condition: service_completed_successfully
+    expose: ["8000"]
+    networks: [backend]
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/ready', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:18080:8080"
+    networks: [backend, ingress]
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  potok_db:
+  potok_documents:
+
+networks:
+  backend:
+    internal: true
+  ingress: {}

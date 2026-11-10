@@ -1,0 +1,31 @@
+{
+  "release": "0.19.0-pilot",
+  "generated_at_utc": "2026-11-08T16:13:13.901891+00:00",
+  "python_files": 130,
+  "compileall": {
+    "passed": true,
+    "output": ""
+  },
+  "static_audit": {
+    "passed": true,
+    "output": "Python files syntax-checked: 130\nAlembic revisions: 29; roots: 1; branches: 0\nFastAPI version: 0.19.0-pilot\n[ACTION REQUIRED] Dashboard KPIs are hard-coded demo values; they are not live CRM metrics.\nRESULT: PASS — static release audit only; no runtime, database, RLS or security penetration tests performed.\n"
+  },
+  "selected_tests": {
+    "passed": true,
+    "files_run": 46,
+    "excluded_due_to_environment": [
+      "test_postgres_rls_integration.py"
+    ],
+    "output": "........................................................................ [ 41%]\n........................................................................ [ 82%]\n...............................                                          [100%]\n175 passed in 0.66s\n"
+  },
+  "postgresql_integration": {
+    "configured": false,
+    "status": "not run: requires psycopg and disposable TEST_ADMIN_DATABASE_URL / TEST_RUNTIME_DATABASE_URL"
+  },
+  "frontend": {
+    "package_lock_present": false,
+    "production_build": "not run: package-lock.json absent or npm dependencies unavailable"
+  },
+  "docker_runtime": "not run: Docker CLI/daemon unavailable in build environment",
+  "production_ready": false
+}

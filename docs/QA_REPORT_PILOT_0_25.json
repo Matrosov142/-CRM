@@ -1,0 +1,80 @@
+{
+  "release": "0.25.0-pilot",
+  "generated_at_utc": "2026-11-10T07:27:31+00:00",
+  "python_files": 148,
+  "compileall": {
+    "passed": true,
+    "output": "Release Gate run 42770185517 / CI run 42770185509: compileall passed (148 Python files)."
+  },
+  "static_audit": {
+    "passed": true,
+    "output": "Release Gate run 42770185517: static audit passed, including tenant-scoped dashboard summary and UTF-8 QA report validation."
+  },
+  "selected_tests": {
+    "passed": true,
+    "files_run": 59,
+    "excluded_due_to_environment": [],
+    "output": "All 59 selected test files passed in Release Gate run 42770185517; PostgreSQL integration and RLS matrix included."
+  },
+  "postgresql_integration": {
+    "configured": true,
+    "status": "passed in Release Gate run 42770185517: PostgreSQL 16, migration upgrade twice, backend QA and RLS matrix; migration head 0033_company_registration_rls."
+  },
+  "frontend": {
+    "package_lock_present": true,
+    "package_lock_sha256": "96491406B390CDA4336CE8DFBED6920362748AB83FCCDA98815F39FC425B6714",
+    "package_lock_version": 3,
+    "production_build": "PASS in run 42770185517: npm ci, npm audit --audit-level=high, production build."
+  },
+  "docker_runtime": "PASS in Release Gate run 42770185517: Compose build/start, API/web health, DB role separation and backup/restore; restore head 0033_company_registration_rls (44 tables).",
+  "production_ready": false,
+  "technical_preflight_2026_11_09": {
+    "source_archive": "POTOK_CRM_v0.25.2(1).zip; extracted and inspected",
+    "workflow_defect": "fixed: set -o pipefail added to QA tee pipeline; contract assertion added; test not executed",
+    "frontend": {
+      "package_json_valid": true,
+      "package_lock_present": true,
+      "npm_available": false,
+      "node_available": true,
+      "pnpm_available": true,
+      "npm_ci_or_lock_generation": "Initial local preflight lacked npm; superseded by committed lockfile and passing CI npm ci/audit/build in run 42593724186."
+    },
+    "backend_tests": "Local Python/pytest unavailable; backend QA passed in GitHub Actions run 42593724186.",
+    "compileall": "Local Python unavailable; compileall passed in GitHub Actions run 42593724186.",
+    "static_audit": "Local Python unavailable; CI static/release audit passed in GitHub Actions run 42593724186.",
+    "yaml_shell_checks": "Local parser/Bash unavailable; workflow YAML and shell checks passed in GitHub Actions run 42593724186.",
+    "postgresql_rls": "Local PostgreSQL/Python unavailable; CI migrations and PostgreSQL RLS integration passed in GitHub Actions run 42593724186.",
+    "docker_compose_smoke": "Local Docker unavailable; Compose smoke passed in GitHub Actions run 42593724186.",
+    "backup_restore": "Local Docker/Bash unavailable; backup checksum and database/document restore passed in GitHub Actions run 42593724186.",
+    "production_ready": false
+  },
+  "last_completed_github_run": {
+    "commit": "60d136c85babec1382955392954f41e050115216",
+    "run_id": 42775061333,
+    "run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42775061333",
+    "release_workflow": "success: all five jobs passed; PostgreSQL 16/backend/RLS, frontend production build, Chromium E2E, lockfile assertion and Docker Compose smoke",
+    "ci_run_id": 42775061283,
+    "ci_run_url": "https://github.com/Matrosov142/-CRM/actions/runs/42775061283",
+    "ci": "success",
+    "production_ready": false
+  },
+  "last_verified_source_commit": "60d136c85babec1382955392954f41e050115216",
+  "last_verified_release_gate": "PASS: all five jobs; Release Gate 42775061333, CI 42775061283; tested commit 60d136c85babec1382955392954f41e050115216.",
+  "last_verified_source_state": {
+    "commit": "60d136c85babec1382955392954f41e050115216",
+    "remaining_release_acceptance": "independent security assessment; target staging TLS/reverse proxy, secrets/rotation, network, monitoring and rollback validation; encrypted target backup/restore with separate storage, retention and measured RPO/RTO; formal synthetic business acceptance; legal and hosting review",
+    "production_ready": false,
+    "status": "automated technical Release Gate and CI passed; external and target-infrastructure acceptance remains open"
+  },
+  "pre_pilot_documentation": {
+    "status": "prepared; not evidence of completed external or target-infrastructure checks",
+    "staging_checklist": "docs/RC1_STAGING_CHECKLIST_RU.md",
+    "backup_restore_runbook": "docs/RC1_BACKUP_RESTORE_RUNBOOK_RU.md",
+    "business_acceptance_template": "docs/RC1_BUSINESS_ACCEPTANCE_TEMPLATE_RU.md",
+    "production_like_staging": "OPEN: target host/domain/TLS, network, secret store/rotation, monitoring/alerts and rollback are not supplied or tested",
+    "target_backup_restore": "OPEN: CI disposable restore passed; target encryption/off-site storage/retention and RPO/RTO are not verified",
+    "business_acceptance": "OPEN: synthetic E2E passed; business rules/metrics and formal owner signoff are pending",
+    "security_review": "OPEN: independent assessment not performed",
+    "legal_hosting_review": "OPEN: applicability and hosting/localization review not performed"
+  }
+}
