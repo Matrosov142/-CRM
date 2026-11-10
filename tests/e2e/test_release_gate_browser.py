@@ -39,7 +39,7 @@ def register(page, company, email):
     page.get_by_label("Пароль").fill(PASSWORD)
     page.locator("form button.primary").click()
     try:
-        page.get_by_role("heading", name="Панель директора").wait_for(timeout=15000)
+        page.get_by_role("heading", name="Панель компании").wait_for(timeout=15000)
     except Exception as exc:
         raise AssertionError(f"Browser registration did not establish a session. UI={page.locator('body').inner_text()} cookies={owner_cookies(page)} responses={responses}") from exc
 
@@ -228,7 +228,8 @@ def test_browser_release_gate_business_and_security():
         manager_page.get_by_label("Электронная почта").fill(manager_email)
         manager_page.get_by_label("Пароль").fill(PASSWORD)
         manager_page.locator("form button.primary").click()
-        manager_page.get_by_role("heading", name="Панель директора").wait_for(timeout=15000)
+        manager_page.get_by_role("heading", name="Панель компании").wait_for(timeout=15000)
+        manager_page.get_by_text("Менеджер закупок", exact=True).wait_for(timeout=10000)
         expect(api(manager_page, "/api/v1/finance/movements", "POST", {
             "movement_number":f"DENY-{suffix}","kind":"payment","amount":"1",
             "movement_date":"2030-01-02T00:00:00Z","counterparty_name":"Denied test"
@@ -240,7 +241,7 @@ def test_browser_release_gate_business_and_security():
         second_page.get_by_label("Электронная почта").fill(email)
         second_page.get_by_label("Пароль").fill(PASSWORD)
         second_page.locator("form button.primary").click()
-        second_page.get_by_role("heading", name="Панель директора").wait_for(timeout=15000)
+        second_page.get_by_role("heading", name="Панель компании").wait_for(timeout=15000)
         sessions = expect(api(page, "/api/v1/auth/session/sessions"))["sessions"]
         target = next(s for s in sessions if not s["current"])
         expect(api(page, f"/api/v1/auth/session/sessions/{target['id']}", "DELETE", {}))

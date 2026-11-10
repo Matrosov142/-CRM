@@ -9,7 +9,13 @@ function csrfHeaders(): Record<string,string> {
 }
 
 type Company = { id: string; name: string; status: string };
+type CurrentUser = { id: string; email: string; company_id: string; role: string };
 type DashboardSummary = { open_tenders: number; authorized_procurement_orders: number; pending_approvals: number; active_reservations: number };
+
+const ROLE_LABELS: Record<string,string> = {
+  director:'Директор', tender_specialist:'Специалист тендерного отдела',
+  procurement_manager:'Менеджер закупок', warehouse:'Склад', logistics:'Логист', accounting:'Бухгалтер',
+};
 type DeliveryOption = { method: string; name: string; total: string; delivery_days?: number | null; source: string; breakdown?: Record<string,string> };
 type DeliveryHistory = { id:string; origin:string; destination:string; distance_km_one_way:string; cargo_description:string; options:DeliveryOption[]; selected_option_index:number|null; created_at:string };
 
@@ -23,6 +29,7 @@ export default function App() {
   // Access token is memory-only; never persist bearer credentials in browser storage.
   const [token, setToken] = useState('cookie-session');
   const [company, setCompany] = useState<Company | null>(null);
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [loadingCompany, setLoadingCompany] = useState(false);
   const [dashboardSummary, setDashboardSummary] = useState<DashboardSummary | null>(null);
   const [dashboardBusy, setDashboardBusy] = useState(false);
@@ -82,6 +89,19 @@ export default function App() {
         setToken('');
       }
     }).finally(() => { if (!cancelled) setLoadingCompany(false); });
+    return () => { cancelled = true; };
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) { setCurrentUser(null); return; }
+    let cancelled = false;
+    fetch(`${API}/api/v1/users/me`, {credentials:'include'})
+      .then(async response => {
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || 'Не удалось загрузить профиль');
+        if (!cancelled) setCurrentUser(data);
+      })
+      .catch(() => { if (!cancelled) setCurrentUser(null); });
     return () => { cancelled = true; };
   }, [token]);
 
@@ -355,7 +375,7 @@ export default function App() {
         <button className="logout" onClick={logout}>↪　Выйти</button>
       </aside>
       <section className="workspace">
-        <header className="dash-top"><div><div className="crumb">Рабочее пространство / {section==='home'?'Главная':section==='tenders'?'Тендеры':section==='shipments'?'Отгрузки':section==='security'?'Безопасность':'Логистика'}</div><h1>{section==='home'?'Панель директора':section==='tenders'?'Реестр тендеров':section==='shipments'?'Отгрузки':section==='security'?'Безопасность':'Расчёт доставки'}</h1></div><div className="user-pill"><span className="avatar">Д</span><span>Директор</span></div></header>
+        <header className="dash-top"><div><div className="crumb">Рабочее пространство / {section==='home'?'Главная':section==='tenders'?'Тендеры':section==='shipments'?'Отгрузки':section==='security'?'Безопасность':'Логистика'}</div><h1>{section==='home'?'Панель компании':section==='tenders'?'Реестр тендеров':section==='shipments'?'Отгрузки':section==='security'?'Безопасность':'Расчёт доставки'}</h1></div><div className="user-pill"><span className="avatar">{ROLE_LABELS[currentUser?.role || '']?.[0] || '•'}</span><span>{ROLE_LABELS[currentUser?.role || ''] || 'Пользователь'}</span></div></header>
         {section==='tenders' ? <div className="delivery-page">
           <div className="welcome"><div><div className="eyebrow">ТЕНДЕРНЫЙ ОТДЕЛ</div><h2>Реестр тендеров</h2><p>Ручной учёт закупочных процедур. Данные сохраняются в базе вашей компании.</p></div><button className="secondary" onClick={loadTenders} disabled={tenderBusy}>Обновить список</button></div>
           <div className="demo-banner">Пока доступен ручной ввод. Автоматическая загрузка с электронных торговых площадок не подключена.</div>

@@ -100,6 +100,8 @@ for phrase in ('ПИЛОТ 0.25', '/api/v1/dashboard/summary'):
         errors.append(f'Pilot UI contract missing: {phrase}')
 if 'const demo =' in frontend or 'Просроченные задачи' in frontend:
     errors.append('Dashboard must not show hard-coded KPI values or unsupported task metrics.')
+if '/api/v1/users/me' not in frontend or "ROLE_LABELS[currentUser?.role || '']" not in frontend:
+    errors.append('Browser header must display the authenticated user role, not a fixed director role.')
 dashboard_source = (ROOT / 'app' / 'routers' / 'dashboard.py').read_text(encoding='utf-8')
 for required in ('model.company_id == company_id', 'Tender.status.in_', 'ApprovalRequest.status == "pending"', 'StockReservation.status == "active"'):
     if required not in dashboard_source:

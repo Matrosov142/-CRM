@@ -185,3 +185,11 @@ GitHub Actions Release Gate run [42593724186](https://github.com/Matrosov142/-CR
 
 
 - Повторная проверка после синхронизации QA/manifest: Release Gate run 36 (5/5) и CI run 75 прошли на docs/manifest commit `0d90eda10b2f4701fe11dfe77190e486461fe79a`.
+
+
+## 2026-11-10 — live dashboard summary
+
+- Демонстрационные KPI и фиктивные progress/task cards заменены на API с tenant-scoped счётчиками: открытые тендеры, утверждённые закупки, ожидающие согласования и активные резервы.
+- Release Gate Chromium E2E проверяет каждый счётчик после создания синтетических данных и подтверждает нули для второй компании. Dashboard status gate в static audit обновлён.
+- Release Gate run 42770185517 (5/5 jobs) и CI run 42770185509 прошли на commit `81762c26129f29b4e8b7c01584cc0dfa60942b6d`.
+- Бизнес-владелец должен подтвердить определения показателей; суммы, прогнозы и просроченные задачи панель не отображает.
