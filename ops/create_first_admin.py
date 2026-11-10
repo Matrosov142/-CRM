@@ -1,16 +1,25 @@
 from __future__ import annotations
 
 import os
-import re
 import sys
 from getpass import getpass
 from urllib.parse import quote_plus
 
+from pydantic import EmailStr, TypeAdapter, ValidationError
 from sqlalchemy import create_engine, func, select
 from sqlalchemy.orm import Session
 
 from app.models import AuditEvent, Company, Membership, User
 from app.security import hash_password
+
+_EMAIL_ADAPTER = TypeAdapter(EmailStr)
+
+
+def normalize_email(value: str) -> str | None:
+    try:
+        return str(_EMAIL_ADAPTER.validate_python(value.strip())).lower()
+    except ValidationError:
+        return None
 
 
 def main() -> int:
@@ -26,8 +35,8 @@ def main() -> int:
         f"{quote_plus(admin_password)}@db:5432/potok_crm"
     )
 
-    email = input("Email первого директора: ").strip().lower()
-    if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email):
+    email = normalize_email(input("Email первого директора: "))
+    if email is None:
         print("Некорректный email.")
         return 2
 

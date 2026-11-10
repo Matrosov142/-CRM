@@ -44,7 +44,7 @@ bash ops/pilot-up.sh
 5. Применяет миграции от имени non-superuser `potok_owner`.
 6. Выдаёт `potok_runtime` ограниченные права и запускает API и web.
 
-`db-migrate` кратковременно получает `DB_OWNER_PASSWORD`, owner `DATABASE_URL` и `JWT_SECRET`, поскольку Alembic импортирует приложение и его настройки. Это отдельный одноразовый контейнер; постоянно работающий `api` получает только runtime `DATABASE_URL` и `JWT_SECRET`. Штатный `ops/pilot-up.sh` удаляет завершившиеся bootstrap/migration containers после успешного запуска.
+`db-bootstrap` и `db-migrate` кратковременно получают только нужные им конфигурацию и секреты: bootstrap получает admin `DATABASE_URL`/пароль и JWT для команды создания первого директора; миграция получает owner `DATABASE_URL`/пароль и JWT, поскольку Alembic импортирует приложение и настройки. Это отдельные одноразовые контейнеры; постоянно работающий `api` получает только runtime `DATABASE_URL` и JWT. Штатный `ops/pilot-up.sh` удаляет завершившиеся bootstrap/migration containers после успешного запуска.
 
 Проверка готовности:
 
@@ -53,6 +53,8 @@ curl -fsS http://127.0.0.1:18080/api/v1/health/ready
 ```
 
 Ожидается JSON со статусом `ready`.
+
+Локальный Compose по умолчанию разрешает browser `Origin` `http://127.0.0.1:18080`, используемый этим loopback ingress. Для staging за reverse proxy задайте точный внешний HTTPS origin через `CORS_ORIGINS` в `.env.pilot` (без пути и завершающего `/`); не оставляйте пустое значение, иначе browser login/session requests будут отклонены.
 
 ## Создание первого директора
 

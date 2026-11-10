@@ -1,4 +1,5 @@
 from pathlib import Path
+from ops.create_first_admin import normalize_email
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -26,3 +27,23 @@ def test_api_runtime_container_does_not_receive_database_owner_secrets():
     assert "DB_OWNER_PASSWORD" not in api_environment
     assert "MIGRATION_DATABASE_URL" not in api_environment
     assert "exec uvicorn" in entry
+
+
+def test_one_shot_bootstrap_has_database_and_jwt_settings_for_first_admin_command():
+    compose = (ROOT / "compose.pilot.yml").read_text()
+    bootstrap_service = compose.split("  db-bootstrap:", 1)[1].split("  db-migrate:", 1)[0]
+    api_environment = compose.split("  api:", 1)[1].split("  web:", 1)[0]
+    assert "DATABASE_URL: postgresql+psycopg://potok_admin:${DB_ADMIN_PASSWORD}@db:5432/potok_crm" in bootstrap_service
+    assert "JWT_SECRET: ${JWT_SECRET:?Create .env.pilot first}" in bootstrap_service
+    assert "DATABASE_URL: postgresql+psycopg://potok_admin" not in api_environment
+
+
+def test_local_pilot_allows_only_its_same_origin_for_browser_sessions():
+    compose = (ROOT / "compose.pilot.yml").read_text()
+    api_environment = compose.split("  api:", 1)[1].split("  web:", 1)[0]
+    assert "CORS_ORIGINS: ${CORS_ORIGINS:-http://127.0.0.1:18080}" in api_environment
+
+
+def test_bootstrap_email_validation_matches_application_email_schema():
+    assert normalize_email("Local-Pilot@example.com") == "local-pilot@example.com"
+    assert normalize_email("local-pilot@example.test") is None

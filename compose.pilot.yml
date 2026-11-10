@@ -27,6 +27,8 @@ services:
       DB_ADMIN_PASSWORD: ${DB_ADMIN_PASSWORD:?Create .env.pilot first}
       DB_OWNER_PASSWORD: ${DB_OWNER_PASSWORD:?Create .env.pilot first}
       RUNTIME_DB_PASSWORD: ${RUNTIME_DB_PASSWORD:?Create .env.pilot first}
+      DATABASE_URL: postgresql+psycopg://potok_admin:${DB_ADMIN_PASSWORD}@db:5432/potok_crm
+      JWT_SECRET: ${JWT_SECRET:?Create .env.pilot first}
     depends_on:
       db:
         condition: service_healthy
@@ -64,7 +66,7 @@ services:
       JWT_ALGORITHM: HS256
       ACCESS_TOKEN_MINUTES: 20
       ALLOW_BOOTSTRAP_REGISTRATION: "false"
-      CORS_ORIGINS: ""
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://127.0.0.1:18080}
       DOCUMENT_STORAGE_PATH: /var/lib/potok-crm/documents
       DOCUMENT_MAX_BYTES: 26214400
     volumes:

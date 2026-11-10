@@ -83,6 +83,8 @@ def test_bootstrap_admin_secret_is_only_passed_to_one_shot_command():
     bootstrap_service = compose.split("  db-bootstrap:", 1)[1].split("  db-migrate:", 1)[0]
     api_environment = compose.split("  api:", 1)[1].split("  web:", 1)[0]
     assert "DB_ADMIN_PASSWORD" in bootstrap_service
+    assert "DATABASE_URL: postgresql+psycopg://potok_admin:${DB_ADMIN_PASSWORD}@db:5432/potok_crm" in bootstrap_service
+    assert "JWT_SECRET" in bootstrap_service
     assert "DB_ADMIN_PASSWORD" not in api_environment
     assert "run --rm --no-deps" in runbook
     assert "--entrypoint python" in runbook
